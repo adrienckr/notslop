@@ -67,6 +67,8 @@ export interface Config {
   default_since: DurationToken;
   per_source_limit: number;
   cache_ttl_seconds: number;
+  /** Optional collections of profiles / blogs / subreddits — used by `--list <name>`. */
+  named_lists: NamedList[];
 }
 
 export const DEFAULT_CONFIG: Config = {
@@ -76,4 +78,54 @@ export const DEFAULT_CONFIG: Config = {
   default_since: "24h",
   per_source_limit: 50,
   cache_ttl_seconds: 600,
+  named_lists: [],
 };
+
+/** A single ZE embedding vector. We store as Float32Array for memory efficiency. */
+export interface Embedding {
+  /** Hash of the input text — primary key. */
+  text_hash: string;
+  /** Model that produced this vector, e.g. "zembed-1". */
+  model: string;
+  /** Vector dimensions, e.g. 1024. */
+  dim: number;
+  /** The vector itself. */
+  vector: Float32Array;
+}
+
+/** A pair of posts found to be near-duplicates of each other. */
+export interface DuplicatePair {
+  /** Post we keep. */
+  kept: Post;
+  /** Post we drop (semantically equivalent). */
+  dropped: Post;
+  /** Cosine similarity between the two — for debug output. */
+  similarity: number;
+}
+
+/** A cluster of semantically related posts grouped by `cluster.ts`. */
+export interface PostCluster {
+  /** A human-readable label — usually the title of the highest-engagement post. */
+  label: string;
+  /** Members, sorted by intra-cluster centrality (most representative first). */
+  members: Post[];
+  /** Average pairwise cosine similarity inside the cluster — quality signal. */
+  cohesion: number;
+}
+
+/** Result row from `find-related`. */
+export interface RelatedPost {
+  post: Post;
+  /** Cosine similarity to the input. */
+  similarity: number;
+  /** 1-based position in the returned list. */
+  rank: number;
+}
+
+/** A named list saved in the user's config — collections of handles, blogs, or subreddits. */
+export interface NamedList {
+  name: string;
+  /** What this list contains. */
+  kind: "x_profiles" | "blogs" | "subreddits";
+  items: string[];
+}
