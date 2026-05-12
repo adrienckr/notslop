@@ -8,7 +8,7 @@ import { request } from "undici";
 
 import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, FetchQuery, Post } from "../types.js";
-import { durationToRange, truncateText, type Platform } from "./_base.js";
+import { type Platform, durationToRange, truncateText } from "./_base.js";
 
 interface HnHit {
   objectID: string;
@@ -79,9 +79,7 @@ export async function fetchHnSearch(query: FetchQuery, config: Config): Promise<
 
   const q = encodeURIComponent(query.query);
   const numericFilter = encodeURIComponent(`created_at_i>${startUnix}`);
-  const url =
-    `https://hn.algolia.com/api/v1/search` +
-    `?query=${q}&tags=story&numericFilters=${numericFilter}&hitsPerPage=${limit}`;
+  const url = `https://hn.algolia.com/api/v1/search?query=${q}&tags=story&numericFilters=${numericFilter}&hitsPerPage=${limit}`;
 
   const response = await fetchJson(url, config.cache_ttl_seconds);
   const hits = response.hits ?? [];

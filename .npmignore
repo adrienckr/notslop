@@ -1,0 +1,17 @@
+.github/
+tests/
+docs/
+examples/
+.vitest-cache/
+coverage/
+*.tsbuildinfo
+src/
+bin/
+*.tape
+.gitignore
+.editorconfig
+biome.json
+tsconfig.json
+tsup.config.ts
+CONTRIBUTING.md
+demo.tape

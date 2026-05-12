@@ -101,8 +101,7 @@ export function formatHeader(title: string): string {
 
 export function formatFooter(meta: PrintMeta): string {
   const sourceCount = meta.fetched.filter((f) => f.status === "ok").length;
-  const durationPart =
-    typeof meta.duration_ms === "number" ? ` in ${meta.duration_ms}ms` : "";
+  const durationPart = typeof meta.duration_ms === "number" ? ` in ${meta.duration_ms}ms` : "";
   const summary = kleur.dim(
     `${meta.total_posts} posts reranked across ${sourceCount} sources${durationPart}`,
   );
@@ -125,11 +124,7 @@ export function printDim(msg: string): void {
 }
 
 /** One progress line, fixed-width label + status glyph + detail. */
-export function progressLine(
-  label: string,
-  status: "ok" | "skip" | "err",
-  detail: string,
-): string {
+export function progressLine(label: string, status: "ok" | "skip" | "err", detail: string): string {
   const labelCol = label.padEnd(14, " ");
   let glyph: string;
   let detailColored: string;
@@ -169,7 +164,9 @@ export function printMarkdown(title: string, ranked: RankedPost[], meta: PrintMe
     const { post, ze_score, rank } = item;
     const rankCell = kleur.bold().white(`${rank.toString().padStart(2, " ")}.`);
     const sourceLabel = colorSource(post.source);
-    const subLabel = post.sub_source ? `${sourceLabel} ${kleur.dim("·")} ${kleur.dim(post.sub_source)}` : sourceLabel;
+    const subLabel = post.sub_source
+      ? `${sourceLabel} ${kleur.dim("·")} ${kleur.dim(post.sub_source)}`
+      : sourceLabel;
     const head = `  ${rankCell} ${kleur.dim("[")}${subLabel}${kleur.dim("]")}  ${formatScore(ze_score)}`;
     write(writeln(head));
 

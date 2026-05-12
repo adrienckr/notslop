@@ -15,7 +15,7 @@ import kleur from "kleur";
 import { DEFAULT_CONFIG_PATH, saveConfig } from "../config.js";
 import { printDim, printError } from "../output.js";
 import { BRIGHTDATA_SIGNUP_URL, zeDashboardUrl } from "../telemetry.js";
-import { DEFAULT_CONFIG, type Config } from "../types.js";
+import { type Config, DEFAULT_CONFIG } from "../types.js";
 
 function splitCsv(raw: string): string[] {
   return raw
@@ -100,7 +100,10 @@ export async function initCommand(): Promise<void> {
       default: "",
     });
     const subreddits = splitCsv(subsRaw).map((s) =>
-      s.replace(/^\/?r\//i, "").replace(/^\//, "").trim(),
+      s
+        .replace(/^\/?r\//i, "")
+        .replace(/^\//, "")
+        .trim(),
     );
 
     const config: Config = {
@@ -119,7 +122,7 @@ export async function initCommand(): Promise<void> {
     printDim(`  config written to ${DEFAULT_CONFIG_PATH}`);
     writeln();
     writeln(kleur.bold("Try it:"));
-    writeln(`  ${kleur.cyan("social-context digest \"AI agents\" --since 24h")}`);
+    writeln(`  ${kleur.cyan('social-context digest "AI agents" --since 24h')}`);
     writeln();
   } catch (err) {
     // @inquirer/prompts throws on Ctrl-C — render it as a clean cancel rather than a stack.

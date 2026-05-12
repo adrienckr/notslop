@@ -8,14 +8,14 @@
  * page. Cached per blog URL so the network is only touched once per TTL.
  */
 
+import { createHash } from "node:crypto";
 import { load as loadHtml } from "cheerio";
 import { XMLParser } from "fast-xml-parser";
-import { createHash } from "node:crypto";
 import { request } from "undici";
 
 import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, FetchQuery, Post } from "../types.js";
-import { durationToRange, truncateText, type Platform } from "./_base.js";
+import { type Platform, durationToRange, truncateText } from "./_base.js";
 
 const USER_AGENT = "social-context/0.1";
 
@@ -31,12 +31,15 @@ const FEED_PROBE_PATHS = [
 
 const SCRAPE_LINK_SELECTORS = ["article a", ".post-title a", "h2 a", "h3 a"];
 
-async function httpGet(url: string): Promise<{ status: number; body: string; contentType: string }> {
+async function httpGet(
+  url: string,
+): Promise<{ status: number; body: string; contentType: string }> {
   const { statusCode, headers, body } = await request(url, {
     method: "GET",
     headers: {
       "User-Agent": USER_AGENT,
-      Accept: "text/html,application/xhtml+xml,application/xml,application/rss+xml,application/atom+xml;q=0.9,*/*;q=0.8",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml,application/rss+xml,application/atom+xml;q=0.9,*/*;q=0.8",
     },
   });
   const text = await body.text();

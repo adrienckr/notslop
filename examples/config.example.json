@@ -1,0 +1,15 @@
+{
+  "zeroentropy_api_key": "ze_xxxxxxxxxxxxxxxxx",
+  "brightdata_api_key": "bd_xxxxxxxxxxxxxxxxx",
+  "x_profiles": ["karpathy", "sama", "AnthropicAI", "OpenAI", "yann_lecun"],
+  "blogs": [
+    "https://anthropic.com/news",
+    "https://openai.com/blog",
+    "https://blog.langchain.dev",
+    "https://huggingface.co/blog"
+  ],
+  "subreddits": ["LocalLLaMA", "ClaudeCode", "MachineLearning", "OpenAI"],
+  "default_since": "24h",
+  "per_source_limit": 50,
+  "cache_ttl_seconds": 600
+}

@@ -9,23 +9,23 @@ import kleur from "kleur";
 import ora from "ora";
 
 import {
+  type PrintMeta,
   printError,
   printJson,
   printMarkdown,
   printTable,
   progressLine,
-  type PrintMeta,
 } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery, Post, SourceName } from "../types.js";
 import {
+  type CommandOptions,
   fetchAll,
   loadOrExit,
   parseOutputFormat,
   parseSince,
   parseTop,
   selectPlatforms,
-  type CommandOptions,
 } from "./_shared.js";
 
 interface PulseOptions extends CommandOptions {
@@ -78,14 +78,16 @@ function printHistogram(posts: Post[], title: string): void {
     const c = counts.get(src);
     if (c === undefined) continue;
     const label = colorSource(src).padEnd(14, " ");
-    writeln(`  ${label} ${kleur.dim("|")} ${bar(c, max)}  ${kleur.bold(String(c))} ${kleur.dim("mentions")}`);
+    writeln(
+      `  ${label} ${kleur.dim("|")} ${bar(c, max)}  ${kleur.bold(String(c))} ${kleur.dim("mentions")}`,
+    );
   }
 }
 
 export async function pulseCommand(topic: string, opts: PulseOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
-      printError("topic is required. usage: social-context pulse \"<topic>\"");
+      printError('topic is required. usage: social-context pulse "<topic>"');
       process.exit(1);
     }
 
@@ -121,11 +123,19 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
     const progressBuffer: string[] = [];
     const fetchSpinner = isJson
       ? null
-      : ora({ text: `Pulse: scanning ${platforms.length} sources over ${since}…`, spinner: "dots" }).start();
+      : ora({
+          text: `Pulse: scanning ${platforms.length} sources over ${since}…`,
+          spinner: "dots",
+        }).start();
 
-    const { posts, fetched } = await fetchAll(platforms, query, config, (name, status, _count, detail) => {
-      progressBuffer.push(progressLine(name, status, detail ?? ""));
-    });
+    const { posts, fetched } = await fetchAll(
+      platforms,
+      query,
+      config,
+      (name, status, _count, detail) => {
+        progressBuffer.push(progressLine(name, status, detail ?? ""));
+      },
+    );
 
     if (fetchSpinner) {
       fetchSpinner.stop();
@@ -154,7 +164,7 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
       ? null
       : ora({ text: "Reranking via ZeroEntropy…", spinner: "dots" }).start();
 
-    let ranked;
+    let ranked: Awaited<ReturnType<typeof rerank>>;
     try {
       ranked = await rerank(posts, topic, config, { topN });
     } catch (err) {
@@ -192,7 +202,9 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
 
     if (opts.debug && !isJson) {
       writeln();
-      process.stdout.write(`${kleur.dim(`debug: ${posts.length} raw posts, ${ranked.length} ranked`)}\n`);
+      process.stdout.write(
+        `${kleur.dim(`debug: ${posts.length} raw posts, ${ranked.length} ranked`)}\n`,
+      );
     }
   } catch (err) {
     printError((err as Error).message);

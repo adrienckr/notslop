@@ -6,17 +6,25 @@
 import kleur from "kleur";
 import ora from "ora";
 
-import { printDim, printError, printJson, printMarkdown, printTable, progressLine, type PrintMeta } from "../output.js";
+import {
+  type PrintMeta,
+  printDim,
+  printError,
+  printJson,
+  printMarkdown,
+  printTable,
+  progressLine,
+} from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery } from "../types.js";
 import {
+  type CommandOptions,
   fetchAll,
   loadOrExit,
   parseOutputFormat,
   parseSince,
   parseTop,
   selectPlatforms,
-  type CommandOptions,
 } from "./_shared.js";
 
 function writeln(line = ""): void {
@@ -26,7 +34,7 @@ function writeln(line = ""): void {
 export async function digestCommand(topic: string, opts: CommandOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
-      printError("topic is required. usage: social-context digest \"<topic>\"");
+      printError('topic is required. usage: social-context digest "<topic>"');
       process.exit(1);
     }
 
@@ -66,9 +74,14 @@ export async function digestCommand(topic: string, opts: CommandOptions): Promis
       ? null
       : ora({ text: `Fetching from ${platforms.length} sources…`, spinner: "dots" }).start();
 
-    const { posts, fetched } = await fetchAll(platforms, query, config, (name, status, _count, detail) => {
-      progressBuffer.push(progressLine(name, status, detail ?? ""));
-    });
+    const { posts, fetched } = await fetchAll(
+      platforms,
+      query,
+      config,
+      (name, status, _count, detail) => {
+        progressBuffer.push(progressLine(name, status, detail ?? ""));
+      },
+    );
 
     if (fetchSpinner) {
       fetchSpinner.stop();
@@ -98,7 +111,7 @@ export async function digestCommand(topic: string, opts: CommandOptions): Promis
       ? null
       : ora({ text: "Reranking via ZeroEntropy…", spinner: "dots" }).start();
 
-    let ranked;
+    let ranked: Awaited<ReturnType<typeof rerank>>;
     try {
       ranked = await rerank(posts, topic, config, { topN });
     } catch (err) {

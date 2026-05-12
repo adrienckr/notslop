@@ -10,7 +10,7 @@ import { request } from "undici";
 
 import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, DurationToken, FetchQuery, Post } from "../types.js";
-import { durationToRange, truncateText, type Platform } from "./_base.js";
+import { type Platform, durationToRange, truncateText } from "./_base.js";
 
 const USER_AGENT = "social-context/0.1 (https://github.com/adrienckr/social-context)";
 
@@ -142,9 +142,7 @@ export async function fetchRedditSearch(query: FetchQuery, config: Config): Prom
     urls.push(buildUrl({ query: query.query, time, limit }));
   }
 
-  const listings = await Promise.all(
-    urls.map((url) => fetchJson(url, config.cache_ttl_seconds)),
-  );
+  const listings = await Promise.all(urls.map((url) => fetchJson(url, config.cache_ttl_seconds)));
 
   const seen = new Set<string>();
   const posts: Post[] = [];

@@ -9,17 +9,17 @@
 import kleur from "kleur";
 import ora from "ora";
 
-import { formatHeader, formatFooter, printError, progressLine, type PrintMeta } from "../output.js";
+import { type PrintMeta, formatFooter, formatHeader, printError, progressLine } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery, RankedPost, SourceName } from "../types.js";
 import {
+  type CommandOptions,
   fetchAll,
   loadOrExit,
   parseOutputFormat,
   parseSince,
   parseTop,
   selectPlatforms,
-  type CommandOptions,
 } from "./_shared.js";
 
 interface VoicesOptions extends CommandOptions {
@@ -131,7 +131,7 @@ function aggregateVoices(ranked: RankedPost[]): VoiceAggregate[] {
 export async function voicesCommand(topic: string, opts: VoicesOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
-      printError("topic is required. usage: social-context voices \"<topic>\"");
+      printError('topic is required. usage: social-context voices "<topic>"');
       process.exit(1);
     }
 
@@ -170,9 +170,14 @@ export async function voicesCommand(topic: string, opts: VoicesOptions): Promise
       ? null
       : ora({ text: `Listening across ${platforms.length} sources…`, spinner: "dots" }).start();
 
-    const { posts, fetched } = await fetchAll(platforms, query, config, (name, status, _count, detail) => {
-      progressBuffer.push(progressLine(name, status, detail ?? ""));
-    });
+    const { posts, fetched } = await fetchAll(
+      platforms,
+      query,
+      config,
+      (name, status, _count, detail) => {
+        progressBuffer.push(progressLine(name, status, detail ?? ""));
+      },
+    );
 
     if (fetchSpinner) {
       fetchSpinner.stop();
@@ -206,7 +211,7 @@ export async function voicesCommand(topic: string, opts: VoicesOptions): Promise
       ? null
       : ora({ text: "Reranking via ZeroEntropy…", spinner: "dots" }).start();
 
-    let ranked;
+    let ranked: Awaited<ReturnType<typeof rerank>>;
     try {
       ranked = await rerank(posts, topic, config, { topN: rerankTop });
     } catch (err) {
@@ -254,7 +259,9 @@ export async function voicesCommand(topic: string, opts: VoicesOptions): Promise
 
     if (opts.debug) {
       writeln();
-      process.stdout.write(`${kleur.dim(`debug: ${ranked.length} ranked posts aggregated into ${voices.length} voices`)}\n`);
+      process.stdout.write(
+        `${kleur.dim(`debug: ${ranked.length} ranked posts aggregated into ${voices.length} voices`)}\n`,
+      );
     }
   } catch (err) {
     printError((err as Error).message);

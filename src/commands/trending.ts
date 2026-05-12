@@ -8,24 +8,24 @@ import kleur from "kleur";
 import ora from "ora";
 
 import {
+  type PrintMeta,
   printDim,
   printError,
   printJson,
   printMarkdown,
   printTable,
   progressLine,
-  type PrintMeta,
 } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery } from "../types.js";
 import {
+  type CommandOptions,
   fetchAll,
   loadOrExit,
   parseOutputFormat,
   parseSince,
   parseTop,
   selectPlatforms,
-  type CommandOptions,
 } from "./_shared.js";
 
 function writeln(line = ""): void {
@@ -35,7 +35,7 @@ function writeln(line = ""): void {
 export async function trendingCommand(niche: string, opts: CommandOptions): Promise<void> {
   try {
     if (!niche || niche.trim().length === 0) {
-      printError("niche is required. usage: social-context trending \"<niche>\"");
+      printError('niche is required. usage: social-context trending "<niche>"');
       process.exit(1);
     }
 
@@ -71,11 +71,19 @@ export async function trendingCommand(niche: string, opts: CommandOptions): Prom
     const progressBuffer: string[] = [];
     const fetchSpinner = isJson
       ? null
-      : ora({ text: `Scanning ${platforms.length} sources for trending signal…`, spinner: "dots" }).start();
+      : ora({
+          text: `Scanning ${platforms.length} sources for trending signal…`,
+          spinner: "dots",
+        }).start();
 
-    const { posts, fetched } = await fetchAll(platforms, query, config, (name, status, _count, detail) => {
-      progressBuffer.push(progressLine(name, status, detail ?? ""));
-    });
+    const { posts, fetched } = await fetchAll(
+      platforms,
+      query,
+      config,
+      (name, status, _count, detail) => {
+        progressBuffer.push(progressLine(name, status, detail ?? ""));
+      },
+    );
 
     if (fetchSpinner) {
       fetchSpinner.stop();
@@ -101,7 +109,7 @@ export async function trendingCommand(niche: string, opts: CommandOptions): Prom
       ? null
       : ora({ text: "Reranking via ZeroEntropy…", spinner: "dots" }).start();
 
-    let ranked;
+    let ranked: Awaited<ReturnType<typeof rerank>>;
     try {
       ranked = await rerank(posts, niche, config, { topN });
     } catch (err) {

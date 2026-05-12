@@ -15,7 +15,7 @@ import { request } from "undici";
 
 import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, FetchQuery, Post } from "../types.js";
-import { durationToRange, truncateText, type Platform } from "./_base.js";
+import { type Platform, durationToRange, truncateText } from "./_base.js";
 
 // TODO: confirm the real dataset id from your Bright Data dashboard.
 const DEFAULT_DATASET_ID = "gd_lwxkxvnf1cynvib9co";

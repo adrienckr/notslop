@@ -14,7 +14,7 @@ import { hnPlatform } from "../platforms/hn.js";
 import { redditPlatform } from "../platforms/reddit.js";
 import { xBrightdataPlatform } from "../platforms/x_brightdata.js";
 
-import { configExists, DEFAULT_CONFIG_PATH, loadConfig } from "../config.js";
+import { DEFAULT_CONFIG_PATH, configExists, loadConfig } from "../config.js";
 import type { PrintMeta } from "../output.js";
 import { printError } from "../output.js";
 import type { Config, DurationToken, FetchQuery, OutputFormat, Post } from "../types.js";
@@ -77,12 +77,7 @@ export async function fetchAll(
   platforms: Platform[],
   query: FetchQuery,
   config: Config,
-  onProgress: (
-    name: string,
-    status: "ok" | "skip" | "err",
-    count: number,
-    detail?: string,
-  ) => void,
+  onProgress: (name: string, status: "ok" | "skip" | "err", count: number, detail?: string) => void,
 ): Promise<FetchAllResult> {
   // Wrap each fetch in an async IIFE so any synchronous throw from a
   // platform implementation still settles as a rejected promise.

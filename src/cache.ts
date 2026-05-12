@@ -11,8 +11,8 @@ import { existsSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DEFAULT_CONFIG_DIR } from "./config.js";
 
-import Database from "better-sqlite3";
 import { join } from "node:path";
+import Database from "better-sqlite3";
 
 const DB_PATH = join(DEFAULT_CONFIG_DIR, "cache.sqlite");
 
@@ -65,7 +65,9 @@ export function cacheClear(): void {
 }
 
 export function cachePurgeExpired(): void {
-  db().prepare("DELETE FROM cache WHERE expires_at <= ?").run(Math.floor(Date.now() / 1000));
+  db()
+    .prepare("DELETE FROM cache WHERE expires_at <= ?")
+    .run(Math.floor(Date.now() / 1000));
 }
 
 export function cacheClose(): void {

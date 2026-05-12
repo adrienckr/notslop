@@ -40,8 +40,6 @@ export function durationToRange(since: string | undefined): { start: Date; end: 
     case "all":
       start.setFullYear(2000);
       break;
-    case "24h":
-    case undefined:
     default:
       start.setHours(start.getHours() - 24);
       break;
