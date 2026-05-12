@@ -1,6 +1,6 @@
 {
   "name": "notslop",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "No more AI slop. Real-time social context for AI agents to ground their content in what's happening today.",
   "type": "module",
   "bin": {
@@ -39,7 +39,10 @@
     "anti-slop",
     "ai-slop",
     "content-creation",
-    "social-signal"
+    "social-signal",
+    "embeddings",
+    "deduplication",
+    "clustering"
   ],
   "author": "adrienckr",
   "license": "MIT",
