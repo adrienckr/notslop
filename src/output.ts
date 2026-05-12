@@ -236,6 +236,26 @@ export function printThemes(clusters: PostCluster[], title: string): void {
   }
 }
 
+/**
+ * Condensed output for LLM consumption. Strips URLs to short forms, keeps
+ * source + author + 1-line takeaway. Token-efficient so the calling agent
+ * pays less.
+ */
+export function printContentMode(title: string, ranked: RankedPost[]): void {
+  write(writeln(`# ${title}`));
+  write(writeln());
+  for (const r of ranked) {
+    const src = `[${r.post.source}${r.post.sub_source ? ` · ${r.post.sub_source}` : ""}]`;
+    const author = r.post.author ? ` @${r.post.author}` : "";
+    write(writeln(`- ${src}${author} (sim ${r.ze_score.toFixed(2)})`));
+    write(writeln(`  ${r.post.title}`));
+    if (r.post.text.length > 0 && r.post.text !== r.post.title) {
+      const oneLine = r.post.text.replace(/\s+/g, " ").slice(0, 240);
+      write(writeln(`  > ${oneLine}`));
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // JSON format
 // ---------------------------------------------------------------------------

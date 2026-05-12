@@ -51,6 +51,7 @@ program
   .option("--list <name>", "Scope to a named list (see `notslop list ls`)")
   .option("--top <n>", "number of top results", "10")
   .option("--format <fmt>", "json | md | table", "md")
+  .option("--for-content", "Token-efficient output for LLM consumption (no URLs, condensed)")
   .option("--debug", "show ZE rerank scores per item")
   .option("--no-cache", "bypass cache, fresh fetch")
   .option("--config <path>", "override config file path")

@@ -9,6 +9,7 @@ import ora from "ora";
 import { dedupPosts } from "../embed/dedup.js";
 import {
   type PrintMeta,
+  printContentMode,
   printDim,
   printError,
   printJson,
@@ -33,7 +34,11 @@ function writeln(line = ""): void {
   process.stdout.write(`${line}\n`);
 }
 
-export async function digestCommand(topic: string, opts: CommandOptions): Promise<void> {
+interface DigestOptions extends CommandOptions {
+  forContent?: boolean;
+}
+
+export async function digestCommand(topic: string, opts: DigestOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
       printError('topic is required. usage: notslop digest "<topic>"');
@@ -159,6 +164,11 @@ export async function digestCommand(topic: string, opts: CommandOptions): Promis
       duration_ms: Date.now() - t0,
       deduped: droppedCount,
     };
+
+    if (opts.forContent) {
+      printContentMode(meta.title, ranked);
+      return;
+    }
 
     if (format === "json") {
       printJson(ranked);
