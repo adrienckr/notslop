@@ -24,10 +24,13 @@ Same as `notslop-write-post`: requires `notslop init` and a ZeroEntropy key.
 
 2. Identify the core insight (the ONE thing the post is saying). Strip the platform-specific framing.
 
-3. **Pull current social context on the topic** (so the adapted version stays grounded in what's happening now, not just the original's snapshot):
+3. **Pull recent related discussions** using `find-related` (more precise than a generic digest because it embeds the source content itself):
+
    ```bash
-   npx notslop@latest digest "<KEY TOPIC FROM SOURCE>" --since 7d --format json --top 5
+   notslop find-related "<URL_OR_PASTED_TEXT>" --since 14d --top 10 --format json
    ```
+
+   Parse the JSON `related` array. Each entry has `post.title`, `post.source`, `post.url`, and `similarity` score.
 
 4. **Write the adapted version** for each target platform the user asked for. The adapted version:
    - Keeps the core insight
