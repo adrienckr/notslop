@@ -83,3 +83,150 @@ export async function findRelatedCommand(
   );
   return findRelatedFromText(resolved, candidates, config, options);
 }
+
+// ---------------------------------------------------------------------------
+// CLI entry — spinner / progress UX
+// ---------------------------------------------------------------------------
+
+import kleur from "kleur";
+import ora from "ora";
+
+import { formatFooter, formatHeader, printError } from "../output.js";
+import {
+  type CommandOptions,
+  fetchAll,
+  loadOrExit,
+  parseOutputFormat,
+  parseTop,
+  selectPlatforms,
+} from "./_shared.js";
+
+interface FindRelatedCliOptions extends CommandOptions {
+  since?: string;
+}
+
+function writeln(line = ""): void {
+  process.stdout.write(`${line}\n`);
+}
+
+export async function findRelatedCli(input: string, opts: FindRelatedCliOptions): Promise<void> {
+  try {
+    if (!input || input.trim().length === 0) {
+      printError('input is required. usage: notslop find-related "<url-or-text>"');
+      process.exit(1);
+    }
+
+    const format = parseOutputFormat(opts.format);
+    const top = parseTop(opts.top, 10);
+    const isJson = format === "json";
+
+    const config = loadOrExit(opts.config);
+    if (opts.cache === false) {
+      config.cache_ttl_seconds = 0;
+    }
+
+    const platforms = selectPlatforms(config, opts.sources);
+    if (platforms.length === 0) {
+      printError(
+        "no platforms selected. run `notslop init` to enable sources, or pass --sources reddit,hn,blogs,x.",
+      );
+      process.exit(1);
+    }
+
+    const t0 = Date.now();
+    const resolveSpinner = isJson
+      ? null
+      : ora({ text: "Resolving input…", spinner: "dots" }).start();
+    const resolved = await resolveInput(input);
+    if (resolveSpinner) resolveSpinner.stop();
+
+    const fetchSpinner = isJson
+      ? null
+      : ora({
+          text: `Fetching candidates from ${platforms.length} sources…`,
+          spinner: "dots",
+        }).start();
+
+    const { posts, fetched } = await fetchAll(
+      platforms,
+      {
+        query: resolved.slice(0, 200),
+        since: (opts.since as "1h" | "6h" | "24h" | "7d" | "30d" | "all" | undefined) ?? "7d",
+        per_source_limit: 50,
+      },
+      config,
+      () => {},
+    );
+
+    if (fetchSpinner) fetchSpinner.stop();
+
+    const rankSpinner = isJson
+      ? null
+      : ora({ text: "Embedding + ranking via ZeroEntropy…", spinner: "dots" }).start();
+
+    const related = await findRelatedFromText(resolved, posts, config, { top });
+
+    if (rankSpinner) rankSpinner.stop();
+
+    if (format === "json") {
+      process.stdout.write(
+        `${JSON.stringify(
+          {
+            input: resolved.slice(0, 200),
+            related: related.map((r) => ({
+              rank: r.rank,
+              similarity: r.similarity,
+              post: r.post,
+            })),
+          },
+          null,
+          2,
+        )}\n`,
+      );
+      return;
+    }
+
+    writeln();
+    writeln(formatHeader(`Related to: ${resolved.slice(0, 40)}${resolved.length > 40 ? "…" : ""}`));
+    writeln();
+
+    if (related.length === 0) {
+      writeln(kleur.dim("No related posts found in the window."));
+      writeln();
+      writeln(
+        formatFooter({
+          title: "find-related",
+          fetched,
+          total_posts: posts.length,
+          reranked: 0,
+          duration_ms: Date.now() - t0,
+        }),
+      );
+      return;
+    }
+
+    for (const r of related) {
+      const rank = kleur.bold().white(`${String(r.rank).padStart(2, " ")}.`);
+      const sim = kleur.dim(`sim ${r.similarity.toFixed(2)}`);
+      const src = r.post.source;
+      const sub = r.post.sub_source ? ` ${kleur.dim("·")} ${kleur.dim(r.post.sub_source)}` : "";
+      writeln(`  ${rank} ${kleur.dim("[")}${src}${sub}${kleur.dim("]")} ${sim}`);
+      writeln(`     ${kleur.white(r.post.title)}`);
+      writeln(`     ${kleur.dim().underline(r.post.url)}`);
+      writeln();
+    }
+
+    writeln(
+      formatFooter({
+        title: "find-related",
+        fetched,
+        total_posts: posts.length,
+        reranked: related.length,
+        duration_ms: Date.now() - t0,
+      }),
+    );
+  } catch (err) {
+    printError((err as Error).message);
+    process.exit(1);
+  }
+}

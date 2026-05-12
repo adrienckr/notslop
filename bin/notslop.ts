@@ -12,6 +12,7 @@
 import { Command } from "commander";
 
 import { digestCommand } from "../src/commands/digest.js";
+import { findRelatedCli } from "../src/commands/find_related.js";
 import { initCommand } from "../src/commands/init.js";
 import { pulseCommand } from "../src/commands/pulse.js";
 import { trendingCommand } from "../src/commands/trending.js";
@@ -100,6 +101,20 @@ program
   .option("--config <path>", "override config file path")
   .action(async (topic: string, opts) => {
     await voicesCommand(topic, opts);
+  });
+
+program
+  .command("find-related <input>")
+  .description("Find recent posts semantically similar to a URL or text input")
+  .option("--since <duration>", "Lookback window (1h | 6h | 24h | 7d | 30d | all)", "7d")
+  .option("--sources <list>", "Comma-separated: reddit,hn,blogs,x")
+  .option("--top <n>", "Number of top results", "10")
+  .option("--format <fmt>", "json | md | table", "md")
+  .option("--debug", "Verbose debug output")
+  .option("--no-cache", "Bypass cache")
+  .option("--config <path>", "Custom config file")
+  .action(async (input, opts) => {
+    await findRelatedCli(input, opts);
   });
 
 // Last-resort top-level error handler. Each command already wraps its own
