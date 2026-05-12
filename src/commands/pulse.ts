@@ -1,5 +1,5 @@
 /**
- * `social-context pulse <topic>` — mention tracker over a window (default 7d).
+ * `notslop pulse <topic>` — mention tracker over a window (default 7d).
  *
  * In addition to the standard fetch+rerank output, prints a tiny per-source
  * histogram showing total mentions in the window.
@@ -87,7 +87,7 @@ function printHistogram(posts: Post[], title: string): void {
 export async function pulseCommand(topic: string, opts: PulseOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
-      printError('topic is required. usage: social-context pulse "<topic>"');
+      printError('topic is required. usage: notslop pulse "<topic>"');
       process.exit(1);
     }
 
@@ -105,7 +105,7 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
     const platforms = selectPlatforms(config, opts.sources);
     if (platforms.length === 0) {
       printError(
-        "no platforms selected. run `social-context init` to enable sources, or pass --sources reddit,hn,blogs,x.",
+        "no platforms selected. run `notslop init` to enable sources, or pass --sources reddit,hn,blogs,x.",
       );
       process.exit(1);
     }

@@ -17,7 +17,7 @@ import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, FetchQuery, Post } from "../types.js";
 import { type Platform, durationToRange, truncateText } from "./_base.js";
 
-const USER_AGENT = "social-context/0.1";
+const USER_AGENT = "notslop/0.2";
 
 const FEED_PROBE_PATHS = [
   "/feed",

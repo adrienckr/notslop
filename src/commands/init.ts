@@ -1,12 +1,12 @@
 /**
- * Interactive `social-context init` wizard.
+ * Interactive `notslop init` wizard.
  *
  * Walks a first-time user through:
  *   1. Acquiring a ZeroEntropy API key (links to dashboard)
  *   2. Optionally configuring Bright Data for X / Twitter
  *   3. Listing competitor blogs and default subreddits
  *
- * Writes the resulting Config to ~/.social-context/config.json via `saveConfig`.
+ * Writes the resulting Config to ~/.notslop/config.json via `saveConfig`.
  */
 
 import { confirm, input, password } from "@inquirer/prompts";
@@ -122,7 +122,7 @@ export async function initCommand(): Promise<void> {
     printDim(`  config written to ${DEFAULT_CONFIG_PATH}`);
     writeln();
     writeln(kleur.bold("Try it:"));
-    writeln(`  ${kleur.cyan('social-context digest "AI agents" --since 24h')}`);
+    writeln(`  ${kleur.cyan('notslop digest "AI agents" --since 24h')}`);
     writeln();
   } catch (err) {
     // @inquirer/prompts throws on Ctrl-C — render it as a clean cancel rather than a stack.

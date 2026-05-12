@@ -12,7 +12,7 @@ import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, DurationToken, FetchQuery, Post } from "../types.js";
 import { type Platform, durationToRange, truncateText } from "./_base.js";
 
-const USER_AGENT = "social-context/0.1 (https://github.com/adrienckr/social-context)";
+const USER_AGENT = "notslop/0.2 (https://github.com/adrienckr/notslop)";
 
 interface RedditChildData {
   id: string;

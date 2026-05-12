@@ -1,5 +1,5 @@
 /**
- * `social-context digest <topic>` — fan-out fetch across enabled platforms,
+ * `notslop digest <topic>` — fan-out fetch across enabled platforms,
  * rerank via ZeroEntropy, render in the chosen format.
  */
 
@@ -34,7 +34,7 @@ function writeln(line = ""): void {
 export async function digestCommand(topic: string, opts: CommandOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
-      printError('topic is required. usage: social-context digest "<topic>"');
+      printError('topic is required. usage: notslop digest "<topic>"');
       process.exit(1);
     }
 
@@ -51,7 +51,7 @@ export async function digestCommand(topic: string, opts: CommandOptions): Promis
     const platforms = selectPlatforms(config, opts.sources);
     if (platforms.length === 0) {
       printError(
-        "no platforms selected. run `social-context init` to enable sources, or pass --sources reddit,hn,blogs,x.",
+        "no platforms selected. run `notslop init` to enable sources, or pass --sources reddit,hn,blogs,x.",
       );
       process.exit(1);
     }

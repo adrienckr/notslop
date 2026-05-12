@@ -1,5 +1,5 @@
 ---
-name: social-context-voices
+name: notslop-voices
 description: Surface the influential voices (authors, accounts, subreddits) on a topic across Reddit, Hacker News, blogs, and X. Use when the user wants to know who is shaping the conversation, not what is being said.
 ---
 
@@ -13,11 +13,11 @@ Activate when the user prompt sounds like any of:
 - "Who should I follow for <topic>?"
 - "Which subreddits / accounts cover <topic>?"
 
-If the user wants the *content* of the conversation rather than the people behind it, use `social-context-digest`.
+If the user wants the *content* of the conversation rather than the people behind it, use `notslop-digest`.
 
 # Setup (one-time)
 
-The user must have run `npx social-context init` and configured:
+The user must have run `npx notslop init` and configured:
 
 - A ZeroEntropy API key (free at https://dashboard.zeroentropy.dev).
 - Optionally: X handles, blog URLs, Bright Data key. The X source materially improves voice discovery.
@@ -31,7 +31,7 @@ If config is missing, the CLI prints an actionable error. Surface it to the user
 3. Optionally widen the rerank pool with `--top 100` so author signal aggregates over more items.
 4. Run via Bash:
    ```bash
-   npx social-context@latest voices "<TOPIC>" --limit <N> --since 7d --format md
+   npx notslop@latest voices "<TOPIC>" --limit <N> --since 7d --format md
    ```
 5. Parse the markdown output. Each voice carries a handle/username, source, and example items.
 6. Return a ranked list with the source tag, a one-line "why they matter" inferred from their cited items, and at least one example URL per voice.
@@ -39,5 +39,5 @@ If config is missing, the CLI prints an actionable error. Surface it to the user
 # Example
 
 > User: "Who's talking about rerankers on AI Twitter?"
-> → Run: `npx social-context@latest voices "rerankers" --limit 5 --since 7d --sources x,hn --format md`
+> → Run: `npx notslop@latest voices "rerankers" --limit 5 --since 7d --sources x,hn --format md`
 > → Return 5 voices, one line each, with source, handle, and a representative URL.

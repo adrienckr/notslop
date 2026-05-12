@@ -1,5 +1,5 @@
 /**
- * Shared types across the social-context CLI.
+ * Shared types across the notslop CLI.
  *
  * All platforms normalize into `Post`. Rerank produces `RankedPost`. The CLI
  * commands and output formatters consume those.

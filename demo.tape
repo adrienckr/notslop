@@ -1,4 +1,4 @@
-# demo.tape — VHS script for social-context
+# demo.tape — VHS script for notslop
 #
 # Renders an animated GIF of a real `digest` invocation.
 # Run with:   brew install vhs && vhs demo.tape
@@ -15,7 +15,7 @@ Set Padding 20
 Set Framerate 24
 
 # Prompt
-Type "social-context digest 'Anthropic MCP' --since 24h"
+Type "notslop digest 'Anthropic MCP' --since 24h"
 Sleep 400ms
 Enter
 
@@ -32,7 +32,7 @@ Sleep 900ms
 Sleep 4s
 
 # Run a second, narrower command to show flag composition
-Type "social-context trending 'agentic coding' --sources hn,reddit --top 5"
+Type "notslop trending 'agentic coding' --sources hn,reddit --top 5"
 Sleep 400ms
 Enter
 Sleep 3s

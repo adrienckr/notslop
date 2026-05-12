@@ -1,5 +1,5 @@
 /**
- * `social-context trending <niche>` — same fetch+rerank flow as digest, but
+ * `notslop trending <niche>` — same fetch+rerank flow as digest, but
  * with a shorter default window. "Trending" implies recent — 6h unless the
  * user overrides --since.
  */
@@ -35,7 +35,7 @@ function writeln(line = ""): void {
 export async function trendingCommand(niche: string, opts: CommandOptions): Promise<void> {
   try {
     if (!niche || niche.trim().length === 0) {
-      printError('niche is required. usage: social-context trending "<niche>"');
+      printError('niche is required. usage: notslop trending "<niche>"');
       process.exit(1);
     }
 
@@ -53,7 +53,7 @@ export async function trendingCommand(niche: string, opts: CommandOptions): Prom
     const platforms = selectPlatforms(config, opts.sources);
     if (platforms.length === 0) {
       printError(
-        "no platforms selected. run `social-context init` to enable sources, or pass --sources reddit,hn,blogs,x.",
+        "no platforms selected. run `notslop init` to enable sources, or pass --sources reddit,hn,blogs,x.",
       );
       process.exit(1);
     }

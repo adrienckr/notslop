@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["bin/social-context.ts"],
+  entry: ["bin/notslop.ts"],
   format: ["esm"],
   target: "node20",
   outDir: "dist",

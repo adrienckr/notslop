@@ -1,11 +1,13 @@
 <!--
-  Hand-captured terminal output for: social-context digest "Anthropic MCP" --since 24h
+  Hand-captured terminal output for: notslop digest "Anthropic MCP" --since 24h
   Box drawing matches src/output.ts formatHeader / printMarkdown / formatFooter.
   Source tags are wrapped in [brackets] with a middle dot between source and sub_source.
   Scores render at fixed two decimals (formatScore).
 -->
 
 ```text
+$ notslop digest "Anthropic MCP" --since 24h
+
 ╭────────────────────────────────────────────────╮
 │  Anthropic MCP — last 24h                      │
 ╰────────────────────────────────────────────────╯
@@ -37,5 +39,5 @@
       @dang · 14h ago · https://news.ycombinator.com/item?id=42300411
 
 90 posts reranked across 4 sources in 4336ms
-Powered by ZeroEntropy  ·  https://dashboard.zeroentropy.dev?utm_source=social-context-cli&utm_medium=output-footer&utm_campaign=v0.1
+Powered by ZeroEntropy  ·  https://dashboard.zeroentropy.dev?utm_source=notslop-cli&utm_medium=output-footer&utm_campaign=v0.2
 ```

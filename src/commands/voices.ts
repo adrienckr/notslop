@@ -1,5 +1,5 @@
 /**
- * `social-context voices <topic>` — surface influential voices on a topic.
+ * `notslop voices <topic>` — surface influential voices on a topic.
  *
  * Runs the standard fetch+rerank flow, then groups the reranked posts by
  * author, summing ze_score per author. Top --limit (default 5) authors are
@@ -131,7 +131,7 @@ function aggregateVoices(ranked: RankedPost[]): VoiceAggregate[] {
 export async function voicesCommand(topic: string, opts: VoicesOptions): Promise<void> {
   try {
     if (!topic || topic.trim().length === 0) {
-      printError('topic is required. usage: social-context voices "<topic>"');
+      printError('topic is required. usage: notslop voices "<topic>"');
       process.exit(1);
     }
 
@@ -150,7 +150,7 @@ export async function voicesCommand(topic: string, opts: VoicesOptions): Promise
     const platforms = selectPlatforms(config, opts.sources);
     if (platforms.length === 0) {
       printError(
-        "no platforms selected. run `social-context init` to enable sources, or pass --sources reddit,hn,blogs,x.",
+        "no platforms selected. run `notslop init` to enable sources, or pass --sources reddit,hn,blogs,x.",
       );
       process.exit(1);
     }

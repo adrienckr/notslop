@@ -1,6 +1,6 @@
 /**
  * UTM-tracked URL builder for the ZeroEntropy dashboard CTA. Adrian (Head of
- * Growth) uses these to attribute signups to social-context.
+ * Growth) uses these to attribute signups to notslop.
  */
 
 import { VERSION } from "./version.js";
@@ -18,7 +18,7 @@ const DASHBOARD_BASE = "https://dashboard.zeroentropy.dev";
 
 export function zeDashboardUrl(touchPoint: TouchPoint): string {
   const params = new URLSearchParams({
-    utm_source: "social-context-cli",
+    utm_source: "notslop-cli",
     utm_medium: touchPoint,
     utm_campaign: `v${VERSION}`,
   });

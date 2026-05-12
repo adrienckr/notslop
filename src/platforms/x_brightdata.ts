@@ -33,7 +33,7 @@ function authHeaders(apiKey: string): Record<string, string> {
   return {
     Authorization: `Bearer ${apiKey}`,
     "Content-Type": "application/json",
-    "User-Agent": "social-context/0.1",
+    "User-Agent": "notslop/0.2",
     Accept: "application/json",
   };
 }

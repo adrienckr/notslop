@@ -1,5 +1,5 @@
 /**
- * CLI output renderers for social-context.
+ * CLI output renderers for notslop.
  *
  * Three formats: human-readable markdown (default), a `cli-table3` table for
  * terminals, and machine-parseable JSON for agents. All three share the same
@@ -31,13 +31,15 @@ export interface PrintMeta {
 // ---------------------------------------------------------------------------
 
 const BANNER_LINES: readonly string[] = [
-  " ___  ___   ___ ___ ___ _    ___ ___  _  _ _____ _____  _______",
-  "/ __|/ _ \\ / __|_ _/ _ \\ |  / __/ _ \\| \\| |_   _| __\\ \\/ /_   _|",
-  "\\__ \\ (_) | (__ | | (_) | |_| (_| (_) | .` | | | | _| >  <  | |  ",
-  "|___/\\___/ \\___|___\\___/____|\\___\\___/|_|\\_| |_| |___/_/\\_\\ |_|  ",
+  "███╗   ██╗ ██████╗ ████████╗███████╗██╗      ██████╗ ██████╗ ",
+  "████╗  ██║██╔═══██╗╚══██╔══╝██╔════╝██║     ██╔═══██╗██╔══██╗",
+  "██╔██╗ ██║██║   ██║   ██║   ███████╗██║     ██║   ██║██████╔╝",
+  "██║╚██╗██║██║   ██║   ██║   ╚════██║██║     ██║   ██║██╔═══╝ ",
+  "██║ ╚████║╚██████╔╝   ██║   ███████║███████╗╚██████╔╝██║     ",
+  "╚═╝  ╚═══╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝ ╚═════╝ ╚═╝     ",
 ];
 
-const BANNER_TAGLINE = "multi-source context for AI agents · powered by ZeroEntropy";
+const BANNER_TAGLINE = "fresh social context. no AI slop.";
 
 export function printBanner(): void {
   if (!process.stdout.isTTY) return;

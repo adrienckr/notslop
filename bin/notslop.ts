@@ -1,5 +1,5 @@
 /**
- * social-context CLI entry point.
+ * NOTSLOP CLI entry point.
  *
  * Five commands:
  *   init      — interactive setup wizard
@@ -22,8 +22,8 @@ import { VERSION } from "../src/version.js";
 const program = new Command();
 
 program
-  .name("social-context")
-  .description("Multi-source social digest for AI agents, reranked by ZeroEntropy.")
+  .name("notslop")
+  .description("No more AI slop. Real-time social context for AI agents.")
   .version(VERSION, "-v, --version", "output the version number")
   .addHelpText("beforeAll", () => {
     if (!process.stdout.isTTY) return "";

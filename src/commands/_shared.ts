@@ -144,7 +144,7 @@ export function loadOrExit(configPath?: string): Config {
   const fileExists = configExists(path);
 
   if (!fileExists && !envKey) {
-    printError("no config found. run `social-context init` first to set up your ZeroEntropy key.");
+    printError("no config found. run `notslop init` first to set up your ZeroEntropy key.");
     process.exit(1);
   }
 
@@ -158,7 +158,7 @@ export function loadOrExit(configPath?: string): Config {
 
   if (!config.zeroentropy_api_key) {
     printError(
-      "ZEROENTROPY_API_KEY not set. run `social-context init` or export ZEROENTROPY_API_KEY in your shell.",
+      "ZEROENTROPY_API_KEY not set. run `notslop init` or export ZEROENTROPY_API_KEY in your shell.",
     );
     process.exit(1);
   }

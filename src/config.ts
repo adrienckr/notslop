@@ -1,7 +1,7 @@
 /**
  * User config: load / save / merge with env overrides.
  *
- * Default location: ~/.social-context/config.json
+ * Default location: ~/.notslop/config.json
  * Env overrides: ZEROENTROPY_API_KEY, BRIGHTDATA_API_KEY
  */
 
@@ -10,7 +10,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { type Config, DEFAULT_CONFIG } from "./types.js";
 
-export const DEFAULT_CONFIG_DIR = join(homedir(), ".social-context");
+export const DEFAULT_CONFIG_DIR = join(homedir(), ".notslop");
 export const DEFAULT_CONFIG_PATH = join(DEFAULT_CONFIG_DIR, "config.json");
 
 export interface LoadConfigOptions {
