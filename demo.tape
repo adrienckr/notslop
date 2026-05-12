@@ -39,3 +39,14 @@ Sleep 3s
 
 # Final pause before loop
 Sleep 1500ms
+
+Sleep 2s
+Type "notslop find-related 'https://anthropic.com/news/claude-4-5'"
+Enter
+Sleep 4s
+Type "notslop list add ai-builders --kind x_profiles --items karpathy,sama,yann_lecun"
+Enter
+Sleep 2s
+Type "notslop install --claude"
+Enter
+Sleep 3s
