@@ -30,6 +30,12 @@ export interface PrintMeta {
 
 // ---------------------------------------------------------------------------
 // Banner — shown on `--help` and at the start of the `init` wizard.
+//
+// v0.4 vaporwave: each character of the banner is rendered with a left-to-right
+// gradient cyan → magenta using ANSI 24-bit true-color (\x1b[38;2;R;G;Bm).
+// No new dep — pure TS. Works in every terminal that supports true-color
+// (iTerm2, Warp, kitty, Alacritty, modern macOS Terminal, Linux gnome-terminal).
+// Falls back to plain cyan when stdout isn't a TTY or COLORTERM is unset.
 // ---------------------------------------------------------------------------
 
 const BANNER_LINES: readonly string[] = [
@@ -42,14 +48,58 @@ const BANNER_LINES: readonly string[] = [
 ];
 
 const BANNER_TAGLINE = "fresh social context. no AI slop.";
+const BANNER_SUBTAG = "signal in. slop out.";
+
+const VAPORWAVE_FROM: [number, number, number] = [0, 255, 255]; // cyan
+const VAPORWAVE_TO: [number, number, number] = [255, 0, 255]; // magenta
+
+function supportsTrueColor(): boolean {
+  if (!process.stdout.isTTY) return false;
+  const colorterm = process.env.COLORTERM ?? "";
+  if (colorterm === "truecolor" || colorterm === "24bit") return true;
+  const term = process.env.TERM ?? "";
+  return term.includes("256color") || term === "xterm-kitty" || term === "alacritty";
+}
+
+/**
+ * Render `text` with a per-character RGB gradient from `from` to `to`.
+ * Width is measured per-line; gradients restart on each newline so the
+ * banner stays balanced regardless of line length.
+ */
+export function gradient(
+  text: string,
+  from: [number, number, number],
+  to: [number, number, number],
+): string {
+  if (!supportsTrueColor()) return text;
+  const lines = text.split("\n");
+  const rendered = lines.map((line) => {
+    const chars = Array.from(line);
+    if (chars.length === 0) return "";
+    return chars
+      .map((ch, i) => {
+        const t = chars.length > 1 ? i / (chars.length - 1) : 0;
+        const r = Math.round(from[0] + (to[0] - from[0]) * t);
+        const g = Math.round(from[1] + (to[1] - from[1]) * t);
+        const b = Math.round(from[2] + (to[2] - from[2]) * t);
+        return `\x1b[38;2;${r};${g};${b}m${ch}\x1b[0m`;
+      })
+      .join("");
+  });
+  return rendered.join("\n");
+}
 
 export function printBanner(): void {
   if (!process.stdout.isTTY) return;
   process.stdout.write("\n");
   for (const line of BANNER_LINES) {
-    process.stdout.write(`  ${kleur.cyan(line)}\n`);
+    const colored = supportsTrueColor()
+      ? gradient(line, VAPORWAVE_FROM, VAPORWAVE_TO)
+      : kleur.cyan(line);
+    process.stdout.write(`  ${colored}\n`);
   }
-  process.stdout.write(`  ${kleur.dim(BANNER_TAGLINE)}\n\n`);
+  process.stdout.write(`  ${kleur.dim(BANNER_TAGLINE)}\n`);
+  process.stdout.write(`  ${kleur.dim().italic(BANNER_SUBTAG)}\n\n`);
 }
 
 // ---------------------------------------------------------------------------

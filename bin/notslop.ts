@@ -28,6 +28,23 @@ program
   .name("notslop")
   .description("No more AI slop. Real-time social context for AI agents.")
   .version(VERSION, "-v, --version", "output the version number")
+  // v0.4 — hosted gateway flags (global). When set, the CLI pulls raw posts
+  // from notslop-api instead of fetching each platform locally. ZE rerank
+  // still runs on the user's own key (BYOK pattern).
+  .option(
+    "--api <url>",
+    "Use hosted notslop-api gateway (e.g. https://notslop-api.fly.dev). Overrides local fetch.",
+  )
+  .option("--api-key <key>", "Bearer token for the hosted gateway")
+  .hook("preAction", (thisCommand) => {
+    const opts = thisCommand.optsWithGlobals() as { api?: string; apiKey?: string };
+    if (opts.api && !process.env.NOTSLOP_API_URL) {
+      process.env.NOTSLOP_API_URL = opts.api;
+    }
+    if (opts.apiKey && !process.env.NOTSLOP_API_KEY) {
+      process.env.NOTSLOP_API_KEY = opts.apiKey;
+    }
+  })
   .addHelpText("beforeAll", () => {
     if (!process.stdout.isTTY) return "";
     const out: string[] = [];

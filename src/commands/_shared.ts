@@ -10,6 +10,7 @@
 
 import ora from "ora";
 
+import { fetchFromApi, resolveApiCreds } from "../api_client.js";
 import type { Platform } from "../platforms/_base.js";
 import { blogsPlatform } from "../platforms/blogs.js";
 import { hnPlatform } from "../platforms/hn.js";
@@ -31,6 +32,10 @@ export interface CommandOptions {
   /** commander auto-inverts --no-cache to .cache=false */
   cache?: boolean;
   config?: string;
+  /** v0.4+ — hosted notslop-api gateway URL (e.g. https://notslop-api.fly.dev). */
+  api?: string;
+  /** v0.4+ — bearer token for the hosted gateway. */
+  apiKey?: string;
 }
 
 /** Stable platform order used everywhere the CLI fans out. */
@@ -77,13 +82,23 @@ export interface FetchAllResult {
  * gets its own live spinner that transitions to a check (succeed) or X (fail)
  * on completion. `onProgress` is still called for each platform so callers can
  * attach their own listeners if needed.
+ *
+ * v0.4+: when `--api <url> --api-key <key>` is passed (or the env vars
+ * `NOTSLOP_API_URL` / `NOTSLOP_API_KEY` are set), the platform fan-out is
+ * replaced by a single GET to `/v1/feed`. The rest of the pipeline (rerank,
+ * dedup, output) is unchanged — ZE still runs on the user's own key.
  */
 export async function fetchAll(
   platforms: Platform[],
   query: FetchQuery,
   config: Config,
   onProgress: (name: string, status: "ok" | "skip" | "err", count: number, detail?: string) => void,
+  apiOpts?: { api?: string; apiKey?: string },
 ): Promise<FetchAllResult> {
+  const creds = resolveApiCreds(apiOpts?.api, apiOpts?.apiKey);
+  if (creds) {
+    return fetchAllViaApi(query, creds, onProgress);
+  }
   const spinners = new Map<string, ReturnType<typeof ora>>();
   const useSpinners = process.stdout.isTTY ?? false;
   if (useSpinners) {
@@ -128,6 +143,44 @@ export async function fetchAll(
   }
 
   return { posts: allPosts, fetched };
+}
+
+/**
+ * `--api` codepath: 1 HTTP call to notslop-api `/v1/feed`. Single spinner.
+ */
+async function fetchAllViaApi(
+  query: FetchQuery,
+  creds: { url: string; key: string },
+  onProgress: (name: string, status: "ok" | "skip" | "err", count: number, detail?: string) => void,
+): Promise<FetchAllResult> {
+  const useSpinner = process.stdout.isTTY ?? false;
+  const spinner = useSpinner ? ora({ text: `notslop-api ${creds.url}…`, spinner: "dots" }) : null;
+  if (spinner) spinner.start();
+
+  try {
+    const posts = await fetchFromApi(query, creds);
+    if (spinner) spinner.succeed(`notslop-api  ${posts.length} posts`);
+    onProgress("notslop-api", posts.length > 0 ? "ok" : "skip", posts.length, creds.url);
+    return {
+      posts,
+      fetched: [
+        {
+          source: "notslop-api",
+          count: posts.length,
+          status: posts.length > 0 ? "ok" : "skip",
+          detail: creds.url,
+        },
+      ],
+    };
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    if (spinner) spinner.fail(`notslop-api error: ${reason}`);
+    onProgress("notslop-api", "err", 0, reason);
+    return {
+      posts: [],
+      fetched: [{ source: "notslop-api", count: 0, status: "err", detail: reason }],
+    };
+  }
 }
 
 export function parseOutputFormat(s?: string): OutputFormat {

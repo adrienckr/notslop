@@ -3,6 +3,29 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.4.0] — 2026-05-12
+
+### Added
+
+- **Vaporwave banner.** ASCII banner is now rendered with a per-character
+  true-color gradient from cyan (`#00FFFF`) to magenta (`#FF00FF`). Pure
+  TypeScript, zero new deps, ANSI 24-bit RGB. Falls back to plain cyan when
+  the terminal doesn't advertise true-color via `COLORTERM`.
+- Secondary tagline `signal in. slop out.` printed under the main tagline.
+- **`--api <url> --api-key <key>` global flags.** When set, the CLI pulls raw
+  posts from a hosted `notslop-api` gateway instead of fetching each platform
+  directly. ZE rerank still runs on the user's own key (BYOK pattern).
+  Equivalent env vars: `NOTSLOP_API_URL`, `NOTSLOP_API_KEY`.
+- `src/api_client.ts` — small undici-based client for the hosted gateway.
+- New `fetchAll` branch routes to the hosted API when creds are present,
+  preserving all downstream pipeline (dedup, rerank, output, themes).
+
+### Notes
+
+- The hosted gateway lives in a separate repo, `adrienckr/notslop-api`. The
+  CLI works fully without it — `--api` is opt-in.
+- No breaking changes to existing commands or skills.
+
 ## [0.3.2] — 2026-05-12
 
 ### Fixed
