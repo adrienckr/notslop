@@ -58,6 +58,16 @@ export interface FetchQuery {
 
 export type OutputFormat = "json" | "md" | "table";
 
+/** A named list saved in the user's config — collections of handles, blogs, or subreddits. */
+export interface NamedList {
+  /** Identifier used with `--list <name>`. */
+  name: string;
+  /** What this list contains. */
+  kind: "x_profiles" | "blogs" | "subreddits";
+  /** The handles, URLs, or subreddit slugs in this list. */
+  items: string[];
+}
+
 export interface Config {
   zeroentropy_api_key?: string;
   brightdata_api_key?: string;
@@ -99,7 +109,7 @@ export interface DuplicatePair {
   kept: Post;
   /** Post we drop (semantically equivalent). */
   dropped: Post;
-  /** Cosine similarity between the two — for debug output. */
+  /** Cosine similarity between the two posts. */
   similarity: number;
 }
 
@@ -120,12 +130,4 @@ export interface RelatedPost {
   similarity: number;
   /** 1-based position in the returned list. */
   rank: number;
-}
-
-/** A named list saved in the user's config — collections of handles, blogs, or subreddits. */
-export interface NamedList {
-  name: string;
-  /** What this list contains. */
-  kind: "x_profiles" | "blogs" | "subreddits";
-  items: string[];
 }
