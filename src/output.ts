@@ -13,7 +13,7 @@ import Table from "cli-table3";
 import kleur from "kleur";
 
 import { zeDashboardUrl } from "./telemetry.js";
-import type { RankedPost, SourceName } from "./types.js";
+import type { PostCluster, RankedPost, SourceName } from "./types.js";
 
 // Respect TTY — disable colors when piping to a file or another process.
 kleur.enabled = process.stdout.isTTY ?? false;
@@ -212,6 +212,28 @@ export function printMarkdown(title: string, ranked: RankedPost[], meta: PrintMe
   // TODO(v0.2): Trending themes — cluster ranked posts and surface top phrases.
 
   write(writeln(formatFooter(meta)));
+}
+
+/**
+ * Render a cluster summary — one entry per theme, ordered by member count.
+ * Used by `pulse`.
+ */
+export function printThemes(clusters: PostCluster[], title: string): void {
+  if (clusters.length === 0) return;
+  write(writeln());
+  write(writeln(kleur.bold().white(title)));
+  for (let i = 0; i < clusters.length; i++) {
+    const c = clusters[i]!;
+    const rank = kleur.bold().white(`${String(i + 1).padStart(2, " ")}.`);
+    const count = kleur.dim(`(${c.members.length} ${c.members.length === 1 ? "post" : "posts"})`);
+    const cohesion = kleur.dim(`coh ${c.cohesion.toFixed(2)}`);
+    write(writeln(`  ${rank} ${kleur.white(c.label)} ${count} ${cohesion}`));
+    for (const m of c.members.slice(0, 2)) {
+      const src = colorSource(m.source);
+      const sub = m.sub_source ? ` ${kleur.dim("·")} ${kleur.dim(m.sub_source)}` : "";
+      write(writeln(`        ${kleur.dim("→")} ${src}${sub} ${kleur.dim().underline(m.url)}`));
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

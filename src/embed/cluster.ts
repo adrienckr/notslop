@@ -33,7 +33,7 @@ function average(vectors: Float32Array[]): Float32Array {
   const dim = vectors[0]!.length;
   const out = new Float32Array(dim);
   for (const v of vectors) {
-    for (let i = 0; i < dim; i++) out[i]! += v[i];
+    for (let i = 0; i < dim; i++) out[i]! += v[i] ?? 0;
   }
   for (let i = 0; i < dim; i++) out[i]! /= vectors.length;
   return out;

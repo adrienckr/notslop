@@ -8,12 +8,13 @@
 import kleur from "kleur";
 import ora from "ora";
 
+import { clusterPosts } from "../embed/cluster.js";
 import {
   type PrintMeta,
   printError,
-  printJson,
   printMarkdown,
   printTable,
+  printThemes,
   progressLine,
 } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
@@ -181,6 +182,24 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
       duration_ms: Date.now() - t0,
     };
 
+    // Theme clustering — replaces the per-source histogram as the headline view.
+    let clusters: Awaited<ReturnType<typeof clusterPosts>> = [];
+    if (posts.length > 1) {
+      const clusterSpinner = isJson
+        ? null
+        : ora({ text: "Clustering themes…", spinner: "dots" }).start();
+      try {
+        clusters = await clusterPosts(posts, config, { mergeThreshold: 0.72 });
+        if (clusterSpinner) clusterSpinner.stop();
+      } catch (err) {
+        if (clusterSpinner)
+          clusterSpinner.warn("Clustering failed — falling back to per-source counts.");
+        if (opts.debug) {
+          process.stderr.write(`debug: cluster error: ${(err as Error).message}\n`);
+        }
+      }
+    }
+
     if (format === "json") {
       const counts = aggregateBySource(posts);
       const mentions: Record<string, number> = {};
@@ -189,15 +208,29 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
         topic,
         window: since,
         mentions,
+        themes: clusters.map((c) => ({
+          label: c.label,
+          count: c.members.length,
+          cohesion: c.cohesion,
+          urls: c.members.slice(0, 5).map((m) => m.url),
+        })),
         ranked: ranked.map((r) => ({ rank: r.rank, ze_score: r.ze_score, post: r.post })),
       };
       process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
     } else if (format === "table") {
       printTable(ranked, meta);
-      printHistogram(posts, `Mentions over ${since}`);
+      if (clusters.length >= 2) {
+        printThemes(clusters, `Themes over ${since}`);
+      } else {
+        printHistogram(posts, `Mentions over ${since}`);
+      }
     } else {
       printMarkdown(meta.title, ranked, meta);
-      printHistogram(posts, `Mentions over ${since}`);
+      if (clusters.length >= 2) {
+        printThemes(clusters, `Themes over ${since}`);
+      } else {
+        printHistogram(posts, `Mentions over ${since}`);
+      }
     }
 
     if (opts.debug && !isJson) {
