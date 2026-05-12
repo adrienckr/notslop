@@ -9,7 +9,7 @@
 import kleur from "kleur";
 import ora from "ora";
 
-import { type PrintMeta, formatFooter, formatHeader, printError, progressLine } from "../output.js";
+import { type PrintMeta, formatFooter, formatHeader, printError } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery, RankedPost, SourceName } from "../types.js";
 import {
@@ -169,24 +169,8 @@ export async function voicesCommand(topic: string, opts: VoicesOptions): Promise
     };
 
     const t0 = Date.now();
-    const progressBuffer: string[] = [];
-    const fetchSpinner = isJson
-      ? null
-      : ora({ text: `Listening across ${platforms.length} sources…`, spinner: "dots" }).start();
 
-    const { posts, fetched } = await fetchAll(
-      platforms,
-      query,
-      config,
-      (name, status, _count, detail) => {
-        progressBuffer.push(progressLine(name, status, detail ?? ""));
-      },
-    );
-
-    if (fetchSpinner) {
-      fetchSpinner.stop();
-      for (const line of progressBuffer) writeln(line);
-    }
+    const { posts, fetched } = await fetchAll(platforms, query, config, () => {});
 
     const meta: PrintMeta = {
       title: `Voices: ${topic}`,

@@ -8,6 +8,8 @@
  *   - config loading with friendly "missing key / run init" errors
  */
 
+import ora from "ora";
+
 import type { Platform } from "../platforms/_base.js";
 import { blogsPlatform } from "../platforms/blogs.js";
 import { hnPlatform } from "../platforms/hn.js";
@@ -71,8 +73,10 @@ export interface FetchAllResult {
 }
 
 /**
- * Run `platform.fetch` for every enabled platform in parallel. Each result is
- * pushed through `onProgress` immediately so callers can render live status.
+ * Run `platform.fetch` for every enabled platform in parallel. Each platform
+ * gets its own live spinner that transitions to a check (succeed) or X (fail)
+ * on completion. `onProgress` is still called for each platform so callers can
+ * attach their own listeners if needed.
  */
 export async function fetchAll(
   platforms: Platform[],
@@ -80,11 +84,21 @@ export async function fetchAll(
   config: Config,
   onProgress: (name: string, status: "ok" | "skip" | "err", count: number, detail?: string) => void,
 ): Promise<FetchAllResult> {
-  // Wrap each fetch in an async IIFE so any synchronous throw from a
-  // platform implementation still settles as a rejected promise.
+  const spinners = new Map<string, ReturnType<typeof ora>>();
+  const useSpinners = process.stdout.isTTY ?? false;
+  if (useSpinners) {
+    for (const p of platforms) {
+      const s = ora({ text: `${p.name}…`, spinner: "dots" });
+      s.start();
+      spinners.set(p.name, s);
+    }
+  }
+
   const settled = await Promise.allSettled(
     platforms.map(async (p) => {
       const posts = await p.fetch(query, config);
+      const s = spinners.get(p.name);
+      if (s) s.succeed(`${p.name.padEnd(8, " ")} ${posts.length} posts`);
       return { name: p.name, posts };
     }),
   );
@@ -106,6 +120,8 @@ export async function fetchAll(
       allPosts.push(...posts);
     } else if (result && result.status === "rejected") {
       const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
+      const s = spinners.get(platform.name);
+      if (s) s.fail(`${platform.name.padEnd(8, " ")} error: ${reason}`);
       onProgress(platform.name, "err", 0, reason);
       fetched.push({ source: platform.name, count: 0, status: "err", detail: reason });
     }

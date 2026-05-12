@@ -14,7 +14,6 @@ import {
   printJson,
   printMarkdown,
   printTable,
-  progressLine,
 } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery } from "../types.js";
@@ -72,27 +71,8 @@ export async function trendingCommand(niche: string, opts: CommandOptions): Prom
     };
 
     const t0 = Date.now();
-    const progressBuffer: string[] = [];
-    const fetchSpinner = isJson
-      ? null
-      : ora({
-          text: `Scanning ${platforms.length} sources for trending signal…`,
-          spinner: "dots",
-        }).start();
 
-    const { posts, fetched } = await fetchAll(
-      platforms,
-      query,
-      config,
-      (name, status, _count, detail) => {
-        progressBuffer.push(progressLine(name, status, detail ?? ""));
-      },
-    );
-
-    if (fetchSpinner) {
-      fetchSpinner.stop();
-      for (const line of progressBuffer) writeln(line);
-    }
+    const { posts, fetched } = await fetchAll(platforms, query, config, () => {});
 
     if (posts.length === 0) {
       if (!isJson) writeln();

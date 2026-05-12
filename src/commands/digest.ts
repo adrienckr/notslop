@@ -77,26 +77,7 @@ export async function digestCommand(topic: string, opts: DigestOptions): Promise
 
     const t0 = Date.now();
 
-    // We buffer per-source progress lines and flush them after the fetch
-    // spinner stops so they don't get clobbered by ora's animation frames.
-    const progressBuffer: string[] = [];
-    const fetchSpinner = isJson
-      ? null
-      : ora({ text: `Fetching from ${platforms.length} sources…`, spinner: "dots" }).start();
-
-    const { posts, fetched } = await fetchAll(
-      platforms,
-      query,
-      config,
-      (name, status, _count, detail) => {
-        progressBuffer.push(progressLine(name, status, detail ?? ""));
-      },
-    );
-
-    if (fetchSpinner) {
-      fetchSpinner.stop();
-      for (const line of progressBuffer) writeln(line);
-    }
+    const { posts, fetched } = await fetchAll(platforms, query, config, () => {});
 
     if (posts.length === 0) {
       if (!isJson) writeln();

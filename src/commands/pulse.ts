@@ -9,14 +9,7 @@ import kleur from "kleur";
 import ora from "ora";
 
 import { clusterPosts } from "../embed/cluster.js";
-import {
-  type PrintMeta,
-  printError,
-  printMarkdown,
-  printTable,
-  printThemes,
-  progressLine,
-} from "../output.js";
+import { type PrintMeta, printError, printMarkdown, printTable, printThemes } from "../output.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { FetchQuery, Post, SourceName } from "../types.js";
 import {
@@ -125,27 +118,8 @@ export async function pulseCommand(topic: string, opts: PulseOptions): Promise<v
     };
 
     const t0 = Date.now();
-    const progressBuffer: string[] = [];
-    const fetchSpinner = isJson
-      ? null
-      : ora({
-          text: `Pulse: scanning ${platforms.length} sources over ${since}…`,
-          spinner: "dots",
-        }).start();
 
-    const { posts, fetched } = await fetchAll(
-      platforms,
-      query,
-      config,
-      (name, status, _count, detail) => {
-        progressBuffer.push(progressLine(name, status, detail ?? ""));
-      },
-    );
-
-    if (fetchSpinner) {
-      fetchSpinner.stop();
-      for (const line of progressBuffer) writeln(line);
-    }
+    const { posts, fetched } = await fetchAll(platforms, query, config, () => {});
 
     if (posts.length === 0) {
       const meta: PrintMeta = {
