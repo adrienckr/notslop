@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+coverage/
+.vitest-cache/
+
+# user config sample (do not commit real keys)
+.social-context/

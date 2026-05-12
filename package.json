@@ -1,0 +1,70 @@
+{
+  "name": "social-context",
+  "version": "0.1.0",
+  "description": "Give your AI agents eyes on what's happening today across Reddit, Hacker News, X, and competitor blogs. Reranked by ZeroEntropy.",
+  "type": "module",
+  "bin": {
+    "social-context": "./dist/social-context.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx bin/social-context.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check src bin tests",
+    "lint:fix": "biome check --write src bin tests",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "social",
+    "reddit",
+    "hacker-news",
+    "twitter",
+    "x",
+    "claude-code",
+    "mcp",
+    "rag",
+    "reranker",
+    "zeroentropy",
+    "agent",
+    "ai-agent"
+  ],
+  "author": "adrienckr",
+  "license": "MIT",
+  "homepage": "https://github.com/adrienckr/social-context",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adrienckr/social-context.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.0.0",
+    "better-sqlite3": "^11.0.0",
+    "cheerio": "^1.0.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^12.0.0",
+    "fast-xml-parser": "^4.5.0",
+    "kleur": "^4.1.5",
+    "ora": "^8.1.0",
+    "undici": "^7.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.0.0"
+  }
+}
