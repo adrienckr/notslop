@@ -29,6 +29,18 @@ NOTSLOP feeds your agent the actual signal. Reddit + Hacker News + curated X han
 
 ---
 
+### v0.3 highlights
+
+- **Cross-source dedup** — when Reddit + HN + a blog all post the same news, you see it once.
+- **Theme clustering** in `pulse` — group similar mentions into themes instead of a flat list.
+- **`find-related`** — give it a URL or your draft, get back the most similar recent discussions.
+- **Named lists** — `notslop list add ai-builders --kind x_profiles --items karpathy,sama,yann_lecun`. Then `notslop digest "RAG" --list ai-builders`.
+- **`--for-content`** — condensed output your agent burns fewer tokens reading.
+- **`install --claude`** — one-liner that drops 12 skills into `~/.claude/skills/` with a Goose-style splash.
+- **6 new content skills** — write-x-tweet, write-x-thread, write-x-article, write-reddit-post, write-reddit-reply, write-linkedin-post. Each platform-aware.
+
+---
+
 ## Quickstart
 
 ```bash
