@@ -150,9 +150,10 @@ export async function digestCommand(topic: string, opts: CommandOptions): Promis
     const meta: PrintMeta = {
       title: `Digest: ${topic}`,
       fetched,
-      total_posts: posts.length,
+      total_posts: dedupedPosts.length,
       reranked: ranked.length,
       duration_ms: Date.now() - t0,
+      deduped: droppedCount,
     };
 
     if (format === "json") {

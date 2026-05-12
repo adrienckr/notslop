@@ -24,6 +24,8 @@ export interface PrintMeta {
   total_posts: number;
   reranked: number;
   duration_ms?: number;
+  /** Number of near-duplicate posts removed before rerank. v0.3+. */
+  deduped?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -126,8 +128,9 @@ export function formatHeader(title: string): string {
 export function formatFooter(meta: PrintMeta): string {
   const sourceCount = meta.fetched.filter((f) => f.status === "ok").length;
   const durationPart = typeof meta.duration_ms === "number" ? ` in ${meta.duration_ms}ms` : "";
+  const dedupPart = meta.deduped && meta.deduped > 0 ? `, ${meta.deduped} dedup'd` : "";
   const summary = kleur.dim(
-    `${meta.total_posts} posts reranked across ${sourceCount} sources${durationPart}`,
+    `${meta.total_posts} posts${dedupPart} reranked across ${sourceCount} sources${durationPart}`,
   );
   const cta = `${kleur.bold().cyan("Powered by ZeroEntropy")}  ${kleur.dim("·")}  ${kleur
     .dim()
