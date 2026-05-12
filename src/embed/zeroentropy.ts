@@ -25,8 +25,12 @@ interface EmbedOptions {
   inputType?: "query" | "document";
 }
 
+interface EmbedResultEntry {
+  embedding: number[];
+}
+
 interface EmbedResponseBody {
-  embeddings: number[][];
+  results: EmbedResultEntry[];
 }
 
 function textHash(text: string): string {
@@ -79,9 +83,10 @@ export async function embedTexts(
   }
 
   // Pass 2: single batched call for the misses.
+  // The API expects `input` (singular) — accepts either a string or an array.
   const body = JSON.stringify({
     model,
-    inputs: missTexts,
+    input: missTexts,
     input_type: inputType,
   });
 
@@ -103,11 +108,14 @@ export async function embedTexts(
     throw new Error("ZeroEntropy rate limit hit — see dashboard for quota");
   }
   if (statusCode < 200 || statusCode >= 300) {
-    throw new Error(`ZeroEntropy embed failed: HTTP ${statusCode}`);
+    // Surface the API's error body so 422-style payload mismatches are debuggable.
+    const errBody = await resBody.text().catch(() => "");
+    const suffix = errBody ? ` — ${errBody.slice(0, 300)}` : "";
+    throw new Error(`ZeroEntropy embed failed: HTTP ${statusCode}${suffix}`);
   }
 
   const parsed = (await resBody.json()) as EmbedResponseBody;
-  const fresh = Array.isArray(parsed?.embeddings) ? parsed.embeddings : [];
+  const fresh = Array.isArray(parsed?.results) ? parsed.results : [];
   if (fresh.length !== missTexts.length) {
     throw new Error(
       `ZeroEntropy embed returned ${fresh.length} vectors for ${missTexts.length} inputs`,
@@ -117,7 +125,7 @@ export async function embedTexts(
   // Pass 3: write misses to cache + fill into the results array.
   for (let i = 0; i < missIndices.length; i++) {
     const idx = missIndices[i]!;
-    const vec = new Float32Array(fresh[i]!);
+    const vec = new Float32Array(fresh[i]!.embedding);
     embedCacheSet(hashes[idx]!, model, vec);
     results[idx] = vec;
   }

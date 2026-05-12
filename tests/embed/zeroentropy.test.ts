@@ -59,7 +59,7 @@ describe("embedTexts", () => {
     mockRequest.mockClear();
 
     mockRequest.mockResolvedValueOnce(
-      mockResponse({ embeddings: [[0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2]] }),
+      mockResponse({ results: [{ embedding: [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2] }] }),
     );
     const out = await embedTexts(["a", "b", "d"], config);
     expect(mockRequest).toHaveBeenCalledTimes(1);

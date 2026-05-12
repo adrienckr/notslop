@@ -3,6 +3,21 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.3.2] — 2026-05-12
+
+### Fixed
+
+- ZeroEntropy embed request payload uses `input` (singular) instead of `inputs`.
+  The live API returns HTTP 422 on `inputs`; verified with the production
+  embed endpoint.
+- ZeroEntropy embed response parser updated to read `results[].embedding`
+  (OpenAI-style envelope) instead of the previous `embeddings: number[][]` shape.
+  This unblocks `find-related`, cross-source dedup in `digest`, and theme
+  clustering in `pulse` end-to-end against the live API.
+- Embed-call error messages now include the API response body (truncated to
+  300 chars) so payload-shape mismatches are debuggable from the CLI output
+  alone, no curl needed.
+
 ## [0.3.1] — 2026-05-12
 
 ### Fixed
