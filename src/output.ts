@@ -237,6 +237,28 @@ export function printThemes(clusters: PostCluster[], title: string): void {
 }
 
 /**
+ * Strip ANSI escape codes — for width calculations against colored strings.
+ */
+function stripAnsi(s: string): string {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape stripping needs them
+  return s.replace(/\x1b\[[0-9;]*m/g, "");
+}
+
+/**
+ * Wrap a block of text in a thin box. Used to visually separate themes /
+ * related results from the main rerank list.
+ */
+export function boxedSection(title: string, content: string): string {
+  const lines = content.split("\n");
+  const maxLen = Math.max(title.length + 4, ...lines.map((l) => stripAnsi(l).length + 2));
+  const width = Math.min(100, maxLen);
+  const top = `┌─ ${kleur.bold().white(title)} ${"─".repeat(Math.max(0, width - title.length - 4))}┐`;
+  const bottom = `└${"─".repeat(width)}┘`;
+  const body = lines.map((l) => `│ ${l.padEnd(width - 2, " ")} │`).join("\n");
+  return `${top}\n${body}\n${bottom}`;
+}
+
+/**
  * Condensed output for LLM consumption. Strips URLs to short forms, keeps
  * source + author + 1-line takeaway. Token-efficient so the calling agent
  * pays less.
