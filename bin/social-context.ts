@@ -16,7 +16,7 @@ import { initCommand } from "../src/commands/init.js";
 import { pulseCommand } from "../src/commands/pulse.js";
 import { trendingCommand } from "../src/commands/trending.js";
 import { voicesCommand } from "../src/commands/voices.js";
-import { printError } from "../src/output.js";
+import { printBanner, printError } from "../src/output.js";
 import { VERSION } from "../src/version.js";
 
 const program = new Command();
@@ -24,7 +24,14 @@ const program = new Command();
 program
   .name("social-context")
   .description("Multi-source social digest for AI agents, reranked by ZeroEntropy.")
-  .version(VERSION, "-v, --version", "output the version number");
+  .version(VERSION, "-v, --version", "output the version number")
+  .addHelpText("beforeAll", () => {
+    if (!process.stdout.isTTY) return "";
+    const out: string[] = [];
+    // Capture the banner to a string by tee-ing kleur output. Simpler: re-render here.
+    printBanner();
+    return out.join("");
+  });
 
 program
   .command("init")

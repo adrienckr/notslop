@@ -27,6 +27,28 @@ export interface PrintMeta {
 }
 
 // ---------------------------------------------------------------------------
+// Banner — shown on `--help` and at the start of the `init` wizard.
+// ---------------------------------------------------------------------------
+
+const BANNER_LINES: readonly string[] = [
+  " ___  ___   ___ ___ ___ _    ___ ___  _  _ _____ _____  _______",
+  "/ __|/ _ \\ / __|_ _/ _ \\ |  / __/ _ \\| \\| |_   _| __\\ \\/ /_   _|",
+  "\\__ \\ (_) | (__ | | (_) | |_| (_| (_) | .` | | | | _| >  <  | |  ",
+  "|___/\\___/ \\___|___\\___/____|\\___\\___/|_|\\_| |_| |___/_/\\_\\ |_|  ",
+];
+
+const BANNER_TAGLINE = "multi-source context for AI agents · powered by ZeroEntropy";
+
+export function printBanner(): void {
+  if (!process.stdout.isTTY) return;
+  process.stdout.write("\n");
+  for (const line of BANNER_LINES) {
+    process.stdout.write(`  ${kleur.cyan(line)}\n`);
+  }
+  process.stdout.write(`  ${kleur.dim(BANNER_TAGLINE)}\n\n`);
+}
+
+// ---------------------------------------------------------------------------
 // Small primitives
 // ---------------------------------------------------------------------------
 

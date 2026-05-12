@@ -13,7 +13,7 @@ import { confirm, input, password } from "@inquirer/prompts";
 import kleur from "kleur";
 
 import { DEFAULT_CONFIG_PATH, saveConfig } from "../config.js";
-import { printDim, printError } from "../output.js";
+import { printBanner, printDim, printError } from "../output.js";
 import { BRIGHTDATA_SIGNUP_URL, zeDashboardUrl } from "../telemetry.js";
 import { type Config, DEFAULT_CONFIG } from "../types.js";
 
@@ -29,9 +29,9 @@ function writeln(line = ""): void {
 }
 
 function banner(): void {
-  writeln();
-  writeln(kleur.bold().cyan("social-context init"));
-  writeln(kleur.dim("Multi-source social digest for AI agents, reranked by ZeroEntropy."));
+  printBanner();
+  writeln(kleur.bold().white("  init wizard"));
+  writeln(kleur.dim("  Set up your ZeroEntropy key, X handles, blogs, and default subs."));
   writeln();
 }
 
