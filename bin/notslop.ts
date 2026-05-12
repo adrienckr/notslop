@@ -14,6 +14,7 @@ import { Command } from "commander";
 import { digestCommand } from "../src/commands/digest.js";
 import { findRelatedCli } from "../src/commands/find_related.js";
 import { initCommand } from "../src/commands/init.js";
+import { listCommand } from "../src/commands/list.js";
 import { pulseCommand } from "../src/commands/pulse.js";
 import { trendingCommand } from "../src/commands/trending.js";
 import { voicesCommand } from "../src/commands/voices.js";
@@ -115,6 +116,45 @@ program
   .option("--config <path>", "Custom config file")
   .action(async (input, opts) => {
     await findRelatedCli(input, opts);
+  });
+
+const listCmd = program
+  .command("list")
+  .description("Manage named collections (x profiles, blogs, subreddits)");
+
+listCmd
+  .command("add <name>")
+  .description("Add items to a named list")
+  .requiredOption("--kind <kind>", "x_profiles | blogs | subreddits")
+  .requiredOption("--items <csv>", "Comma-separated items")
+  .option("--config <path>")
+  .action(async (name, opts) => {
+    await listCommand("add", { name, kind: opts.kind, items: opts.items, configPath: opts.config });
+  });
+
+listCmd
+  .command("remove <name>")
+  .description("Remove items from a named list")
+  .requiredOption("--items <csv>", "Comma-separated items")
+  .option("--config <path>")
+  .action(async (name, opts) => {
+    await listCommand("remove", { name, items: opts.items, configPath: opts.config });
+  });
+
+listCmd
+  .command("show <name>")
+  .description("Show a named list")
+  .option("--config <path>")
+  .action(async (name, opts) => {
+    await listCommand("show", { name, configPath: opts.config });
+  });
+
+listCmd
+  .command("ls")
+  .description("List all named lists")
+  .option("--config <path>")
+  .action(async (opts) => {
+    await listCommand("ls", { configPath: opts.config });
   });
 
 // Last-resort top-level error handler. Each command already wraps its own
