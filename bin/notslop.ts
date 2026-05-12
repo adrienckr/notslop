@@ -14,6 +14,7 @@ import { Command } from "commander";
 import { digestCommand } from "../src/commands/digest.js";
 import { findRelatedCli } from "../src/commands/find_related.js";
 import { initCommand } from "../src/commands/init.js";
+import { installCommand } from "../src/commands/install.js";
 import { listCommand } from "../src/commands/list.js";
 import { pulseCommand } from "../src/commands/pulse.js";
 import { trendingCommand } from "../src/commands/trending.js";
@@ -40,6 +41,15 @@ program
   .description("Interactive setup: ZeroEntropy key, X handles, blog list")
   .action(async () => {
     await initCommand();
+  });
+
+program
+  .command("install")
+  .description("Install Claude Code skills + show splash (run after `init`)")
+  .option("--claude", "Install skills into ~/.claude/skills/")
+  .option("--config <path>", "Custom config file")
+  .action(async (opts) => {
+    await installCommand(opts);
   });
 
 program
