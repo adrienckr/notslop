@@ -32,11 +32,22 @@ NOTSLOP feeds your agent the actual signal. Reddit + Hacker News + curated X han
 ## Quickstart
 
 ```bash
-npx notslop init                                  # one-time setup
-npx notslop digest "Anthropic MCP" --since 24h    # read the room
+npx notslop init                  # interactive wizard: ZE key, X handles, blogs
+npx notslop install --claude      # drop 12 skills into ~/.claude/skills/, see splash
 ```
 
-That's it. Topic in, ranked digest out, agent-ready JSON or terminal-pretty markdown.
+After install, open Claude Code and try:
+
+- `/notslop digest about <topic>`
+- `/notslop write a tweet about <topic>`
+- `/notslop write an X article about <topic>`
+- `/notslop find related to <url>`
+
+The CLI also works directly in any shell:
+
+```bash
+notslop digest "Anthropic MCP" --since 24h --top 5 --format md
+```
 
 ---
 
@@ -66,6 +77,7 @@ The output is a post grounded in two specific things people said in the last 24 
 | Command    | Description                                            |
 |------------|--------------------------------------------------------|
 | `init`     | Interactive setup: ZeroEntropy key, X handles, blogs   |
+| `notslop install --claude` | Drop 12 skills into `~/.claude/skills/` and show suggested slash commands |
 | `digest`   | Multi-source digest of recent conversations on a topic |
 | `trending` | What's blowing up right now in a niche                 |
 | `pulse`    | Mention tracker for a topic over a window              |
