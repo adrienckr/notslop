@@ -98,6 +98,7 @@ import {
   loadOrExit,
   parseOutputFormat,
   parseTop,
+  resolveList,
   selectPlatforms,
 } from "./_shared.js";
 
@@ -147,12 +148,16 @@ export async function findRelatedCli(input: string, opts: FindRelatedCliOptions)
           spinner: "dots",
         }).start();
 
+    const listOverrides = resolveList(config, opts.list);
     const { posts, fetched } = await fetchAll(
       platforms,
       {
         query: resolved.slice(0, 200),
         since: (opts.since as "1h" | "6h" | "24h" | "7d" | "30d" | "all" | undefined) ?? "7d",
         per_source_limit: 50,
+        subreddits: listOverrides.subreddits,
+        x_profiles: listOverrides.x_profiles,
+        blog_urls: listOverrides.blogs,
       },
       config,
       () => {},

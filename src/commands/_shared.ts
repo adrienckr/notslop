@@ -17,11 +17,12 @@ import { xBrightdataPlatform } from "../platforms/x_brightdata.js";
 import { DEFAULT_CONFIG_PATH, configExists, loadConfig } from "../config.js";
 import type { PrintMeta } from "../output.js";
 import { printError } from "../output.js";
-import type { Config, DurationToken, FetchQuery, OutputFormat, Post } from "../types.js";
+import type { Config, DurationToken, FetchQuery, NamedList, OutputFormat, Post } from "../types.js";
 
 export interface CommandOptions {
   since?: string;
   sources?: string;
+  list?: string;
   top?: string;
   format?: string;
   debug?: boolean;
@@ -132,6 +133,33 @@ export function parseTop(s?: string, fallback = 10): number {
     throw new Error(`invalid --top "${s}". expected a positive integer`);
   }
   return n;
+}
+
+/**
+ * Resolve a --list <name> flag into partial FetchQuery overrides. When a named
+ * list is provided it replaces the corresponding config-level field so only
+ * items in the list are queried. Throws on unknown list names so the user gets
+ * an actionable message rather than a silent no-op.
+ */
+export function resolveList(
+  config: Config,
+  listName: string | undefined,
+): Partial<{ x_profiles: string[]; blogs: string[]; subreddits: string[] }> {
+  if (!listName) return {};
+  const found: NamedList | undefined = config.named_lists.find((l) => l.name === listName);
+  if (!found) {
+    throw new Error(
+      `list "${listName}" not found — run \`notslop list ls\` to see available lists`,
+    );
+  }
+  switch (found.kind) {
+    case "x_profiles":
+      return { x_profiles: found.items };
+    case "blogs":
+      return { blogs: found.items };
+    case "subreddits":
+      return { subreddits: found.items };
+  }
 }
 
 /**

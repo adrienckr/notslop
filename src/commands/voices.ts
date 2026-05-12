@@ -19,6 +19,7 @@ import {
   parseOutputFormat,
   parseSince,
   parseTop,
+  resolveList,
   selectPlatforms,
 } from "./_shared.js";
 
@@ -155,13 +156,16 @@ export async function voicesCommand(topic: string, opts: VoicesOptions): Promise
       process.exit(1);
     }
 
+    const listOverrides = resolveList(config, opts.list);
     const query: FetchQuery = {
       query: topic,
       since,
       per_source_limit: config.per_source_limit,
-      subreddits: config.subreddits.length > 0 ? config.subreddits : undefined,
-      x_profiles: config.x_profiles.length > 0 ? config.x_profiles : undefined,
-      blog_urls: config.blogs.length > 0 ? config.blogs : undefined,
+      subreddits:
+        listOverrides.subreddits ?? (config.subreddits.length > 0 ? config.subreddits : undefined),
+      x_profiles:
+        listOverrides.x_profiles ?? (config.x_profiles.length > 0 ? config.x_profiles : undefined),
+      blog_urls: listOverrides.blogs ?? (config.blogs.length > 0 ? config.blogs : undefined),
     };
 
     const t0 = Date.now();
