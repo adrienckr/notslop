@@ -9,9 +9,9 @@
  * Complexity: O(n³) worst case. For pulse-sized n (≤ 200) this is ~ms.
  */
 
+import type { Config, Post, PostCluster } from "../types.js";
 import { cosineSimilarity } from "./cosine.js";
 import { embedTexts } from "./zeroentropy.js";
-import type { Config, Post, PostCluster } from "../types.js";
 
 export interface ClusterOptions {
   /** Cosine threshold above which two clusters are merged. Default 0.72. */
@@ -33,7 +33,7 @@ function average(vectors: Float32Array[]): Float32Array {
   const dim = vectors[0]!.length;
   const out = new Float32Array(dim);
   for (const v of vectors) {
-    for (let i = 0; i < dim; i++) out[i]! += v[i]!;
+    for (let i = 0; i < dim; i++) out[i]! += v[i];
   }
   for (let i = 0; i < dim; i++) out[i]! /= vectors.length;
   return out;
@@ -83,9 +83,7 @@ export async function clusterPosts(
   }
 
   const out: PostCluster[] = clusters.map((c) => {
-    const members = c.ids
-      .map((i) => posts[i]!)
-      .sort((x, y) => engagement(y) - engagement(x));
+    const members = c.ids.map((i) => posts[i]!).sort((x, y) => engagement(y) - engagement(x));
     let pairSum = 0;
     let pairCount = 0;
     for (let i = 0; i < c.ids.length; i++) {
