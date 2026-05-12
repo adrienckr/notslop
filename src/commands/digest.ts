@@ -6,6 +6,7 @@
 import kleur from "kleur";
 import ora from "ora";
 
+import { dedupPosts } from "../embed/dedup.js";
 import {
   type PrintMeta,
   printDim,
@@ -107,13 +108,39 @@ export async function digestCommand(topic: string, opts: CommandOptions): Promis
       return;
     }
 
+    // Cross-source dedup — kill the duplicate noise before we pay for rerank.
+    let dedupedPosts = posts;
+    let droppedCount = 0;
+    if (posts.length > 1) {
+      const dedupSpinner = isJson
+        ? null
+        : ora({ text: "Deduping cross-source…", spinner: "dots" }).start();
+      try {
+        const result = await dedupPosts(posts, config, { threshold: 0.85 });
+        dedupedPosts = result.kept;
+        droppedCount = result.dropped.length;
+        if (dedupSpinner) {
+          dedupSpinner.stop();
+          if (droppedCount > 0 && opts.debug) {
+            writeln(progressLine("dedup", "ok", `${droppedCount} duplicates removed`));
+          }
+        }
+      } catch (err) {
+        // Dedup is best-effort; if it fails, log and continue with raw posts.
+        if (dedupSpinner) dedupSpinner.warn("Dedup failed — continuing with raw posts.");
+        if (opts.debug) {
+          process.stderr.write(`debug: dedup error: ${(err as Error).message}\n`);
+        }
+      }
+    }
+
     const rerankSpinner = isJson
       ? null
       : ora({ text: "Reranking via ZeroEntropy…", spinner: "dots" }).start();
 
     let ranked: Awaited<ReturnType<typeof rerank>>;
     try {
-      ranked = await rerank(posts, topic, config, { topN });
+      ranked = await rerank(dedupedPosts, topic, config, { topN });
     } catch (err) {
       if (rerankSpinner) rerankSpinner.fail("Rerank failed.");
       throw err;
