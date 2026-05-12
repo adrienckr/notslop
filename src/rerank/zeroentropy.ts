@@ -14,8 +14,9 @@ import { cacheGet, cacheKey, cacheSet } from "../cache.js";
 import type { Config, Post, RankedPost } from "../types.js";
 
 // Override via `ZEROENTROPY_BASE_URL` env var if ZE moves their API or you proxy it.
-const ZE_BASE_URL = process.env.ZEROENTROPY_BASE_URL ?? "https://api.zeroentropy.com/v1";
-const RERANK_ENDPOINT = `${ZE_BASE_URL}/models/rerank`;
+// Override via `ZEROENTROPY_BASE_URL` env var if ZE moves their API or you proxy it.
+const ZE_BASE_URL = process.env.ZEROENTROPY_BASE_URL ?? "https://api.zeroentropy.dev/v1";
+const RERANK_ENDPOINT = process.env.ZEROENTROPY_RERANK_URL ?? `${ZE_BASE_URL}/models/rerank`;
 const DEFAULT_MODEL = "zerank-2";
 const DEFAULT_TOP_N = 10;
 const DOC_CHAR_LIMIT = 2000;

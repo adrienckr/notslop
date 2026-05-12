@@ -13,8 +13,10 @@ import { request } from "undici";
 import type { Config } from "../types.js";
 import { embedCacheGet, embedCacheSet } from "./cache.js";
 
-const ZE_BASE_URL = process.env.ZEROENTROPY_BASE_URL ?? "https://api.zeroentropy.com/v1";
-const EMBED_ENDPOINT = `${ZE_BASE_URL}/models/embed`;
+// Override base URL via `ZEROENTROPY_BASE_URL` or just the embed endpoint via
+// `ZEROENTROPY_EMBED_URL` if the embed path differs from the convention.
+const ZE_BASE_URL = process.env.ZEROENTROPY_BASE_URL ?? "https://api.zeroentropy.dev/v1";
+const EMBED_ENDPOINT = process.env.ZEROENTROPY_EMBED_URL ?? `${ZE_BASE_URL}/models/embed`;
 const DEFAULT_MODEL = "zembed-1";
 const DOC_CHAR_LIMIT = 2000;
 

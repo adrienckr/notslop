@@ -3,6 +3,17 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.3.1] — 2026-05-12
+
+### Fixed
+
+- Default ZeroEntropy base URL switched from `api.zeroentropy.com` (does not
+  resolve) to `api.zeroentropy.dev`. Verified working against the live
+  rerank endpoint.
+- Embed endpoint is now overridable independently via `ZEROENTROPY_EMBED_URL`,
+  and rerank via `ZEROENTROPY_RERANK_URL`. Useful when the embed path differs
+  from the convention `${base}/models/embed`.
+
 ## [0.3.0] — 2026-05-12
 
 ### Added
