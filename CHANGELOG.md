@@ -3,6 +3,39 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.6.0] — 2026-05-13
+
+### Added — 7 new content-creation skills
+
+- `notslop-write-blog-post` — long-form 1500-3000 words, SEO-aware. Inspired by
+  Claude SEO patterns (E-E-A-T citations, per-section word counts, AI Overview
+  citation-readiness, focus-keyword density targeting). Pulls 7-day signal,
+  clusters themes via `pulse`, surfaces undercovered angles, then generates a
+  content brief BEFORE the draft and the draft itself with inline citations
+  to real posts.
+- `notslop-write-blog-headline` — 8 candidate H1 titles + meta descriptions
+  (155-160 chars) for a focus keyword. Hard caps + pattern mix (specific-outcome,
+  contrarian, explainer, question, list). Lighter than the full blog-post skill.
+- `notslop-write-show-hn-post` — Show HN launch post with title (<80 chars) +
+  body grounded in recent Show HN posts in the same niche.
+- `notslop-write-product-hunt-launch` — tagline + maker first comment + feature
+  highlights for a PH launch.
+- `notslop-write-readme-pitch` — README hero section for OSS repos (title,
+  tagline, badges, what-it-is, quickstart, why-it's-different).
+- `notslop-write-cold-dm` — personalized cold DM grounded in the recipient's
+  recent posts. 50-90 words, no flattery, references a specific thing they said.
+- `notslop-write-twitter-bio` — 5 bio variants for X (160-char cap) or LinkedIn
+  headline. Patterns: observational / declarative / specific-results / playful /
+  contrarian. Grounded in what's working in the user's niche.
+
+Total skills shipped: 19 (12 existing + 7 new). All discovered automatically by
+`notslop install --claude` — no code changes required.
+
+### Changed
+
+- `--help` text reorganized — skills now grouped under "Content creation" and
+  "Research & analysis" with each new prompt listed.
+
 ## [0.5.0] — 2026-05-13
 
 ### Changed (breaking)

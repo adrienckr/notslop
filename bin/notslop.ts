@@ -65,15 +65,26 @@ How it works:
 
 Claude Code skills (run \`notslop install --claude\` once, then use natural language):
 
+  Content creation:
   "write me a tweet about <topic>"          → notslop-write-x-tweet
   "write an X thread about <topic>"         → notslop-write-x-thread
   "write an X article about <topic>"        → notslop-write-x-article
   "write a LinkedIn post about <topic>"     → notslop-write-linkedin-post
   "write a Reddit post for r/<sub>"         → notslop-write-reddit-post
   "reply to <reddit-thread-url>"            → notslop-write-reddit-reply
+  "write a blog post about <topic>"         → notslop-write-blog-post (SEO-aware, 1500-3000 words)
+  "write a blog title + meta on <topic>"    → notslop-write-blog-headline
+  "write a Show HN post for <project>"      → notslop-write-show-hn-post
+  "write a ProductHunt launch for <X>"      → notslop-write-product-hunt-launch
+  "write a README hero for <repo>"          → notslop-write-readme-pitch
+  "write a cold DM to <handle>"             → notslop-write-cold-dm
+  "rewrite my Twitter bio"                  → notslop-write-twitter-bio
   "repurpose <my-post> for other platforms" → notslop-repurpose
+
+  Research & analysis:
   "what's hot on <topic> today"             → notslop-digest / -trending
   "who's shaping the <topic> conversation"  → notslop-voices
+  "track mentions of <topic> over 7 days"   → notslop-pulse
   "find posts similar to <url-or-text>"     → notslop-find-related
 
 Each skill fetches fresh signal via the CLI and grounds the output in real posts.
