@@ -119,18 +119,6 @@ Per-source setup walkthroughs are in [PROVIDERS.md](./PROVIDERS.md). `notslop so
 
 ---
 
-## Hosted gateway (optional)
-
-If you don't want to wire Orthogonal locally, the CLI can pull raw posts from a hosted instance:
-
-```bash
-notslop digest "RAG" --api https://api.notslop.dev
-```
-
-The gateway is **stateless** — never sees your ZeroEntropy key (rerank runs locally), doesn't store any record of who called it. Source: [`adrienckr/notslop-api`](https://github.com/adrienckr/notslop-api). MIT-licensed, self-host in 5 minutes on Fly.io.
-
----
-
 ## Configuration
 
 `notslop init` writes `~/.notslop/config.json`. Env vars override what's in the file:
@@ -138,14 +126,13 @@ The gateway is **stateless** — never sees your ZeroEntropy key (rerank runs lo
 ```
 ZEROENTROPY_API_KEY      required — rerank + embed (runs locally)
 ORTHOGONAL_API_KEY       optional — X scraping
-NOTSLOP_API_URL          optional — point at a hosted notslop-api instance
 ```
 
 ---
 
 ## Companion repos
 
-- [`notslop-api`](https://github.com/adrienckr/notslop-api) — the stateless BYOK gateway. MIT. Self-host with one `fly launch`.
+- [`notslop-api`](https://github.com/adrienckr/notslop-api) — optional stateless gateway behind a `--api <url>` flag for teams that want to centralize scraping. MIT. Self-host on Fly.io.
 - [`notslop-web`](https://github.com/adrienckr/notslop-web) — the landing page at [notslop.dev](https://notslop.dev). Astro + Tailwind. MIT.
 
 ---
