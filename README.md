@@ -149,7 +149,7 @@ your phrase to Claude Code
    ┌────┴────┬─────────┬─────────┐
    ▼         ▼         ▼         ▼
  reddit/    hn/      blogs/     x/
- JSON     Algolia   RSS+cheerio Bright Data
+ JSON     Algolia   RSS+cheerio Orthogonal
         │
         ▼
    ZeroEntropy zembed-1 (cross-source dedup)
@@ -170,7 +170,7 @@ Total: 1-3 seconds for cached topics, 5-10 seconds for fresh.
 
 ## Hosted gateway (optional)
 
-A companion API exists at [github.com/adrienckr/notslop-api](https://github.com/adrienckr/notslop-api). If you don't want to wire Bright Data + run the scraping yourself, the CLI can pull raw posts from a hosted instance:
+A companion API exists at [github.com/adrienckr/notslop-api](https://github.com/adrienckr/notslop-api). If you don't want to wire Orthogonal + run the scraping yourself, the CLI can pull raw posts from a hosted instance:
 
 ```bash
 notslop digest "RAG" --api https://api.notslop.dev
@@ -185,7 +185,7 @@ The gateway is **stateless** — it never sees your ZeroEntropy key (rerank runs
 | If you want to use… | You need | Cost |
 |---|---|---|
 | Reddit, HN, blogs (default) | nothing | free |
-| X (Twitter) | a Bright Data account + the X dataset | ~$0.001 per post |
+| X (Twitter) | an Orthogonal account | ~$0.02 per handle scrape ($10 free at signup) |
 | Rerank + embed (recommended) | a ZeroEntropy account | free tier covers most |
 
 ZeroEntropy is the only required key — skip X and Reddit/HN/blogs still cover
@@ -199,8 +199,7 @@ what's missing on your machine; `notslop sources --check x` live-tests a source.
 
 ```
 ZEROENTROPY_API_KEY      required for rerank/embed
-BRIGHTDATA_API_KEY       optional, for X scraping
-BRIGHTDATA_DATASET_ID    Bright Data dataset for X posts by URL
+ORTHOGONAL_API_KEY       optional, for X scraping
 NOTSLOP_API_URL          point at a hosted notslop-api instance
 ```
 

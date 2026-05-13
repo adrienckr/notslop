@@ -25,4 +25,4 @@ export function zeDashboardUrl(touchPoint: TouchPoint): string {
   return `${DASHBOARD_BASE}?${params.toString()}`;
 }
 
-export const BRIGHTDATA_SIGNUP_URL = "https://brightdata.com/products/datasets/twitter";
+export const ORTHOGONAL_SIGNUP_URL = "https://orthogonal.com/sign-up";

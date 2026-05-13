@@ -4,7 +4,7 @@
  * When the CLI is invoked with `--api <url>` (or the env var `NOTSLOP_API_URL`
  * is set), `fetchAll` swaps the local platform fan-out for a single round-trip
  * to `POST /v1/scrape`. The CLI sends its local config (subreddits, X handles,
- * blog URLs, Bright Data creds) in the body — the server is stateless and
+ * blog URLs, Orthogonal creds) in the body — the server is stateless and
  * stores nothing about the caller. The rest of the pipeline (rerank, dedup,
  * output) is unchanged — ZE still runs locally on the user's own key.
  */
@@ -64,7 +64,7 @@ interface ScrapeBody {
     hn: boolean;
   };
   creds?: {
-    brightdata?: { api_key: string; dataset_id: string };
+    orthogonal?: { api_key: string };
   };
 }
 
@@ -96,15 +96,10 @@ export async function fetchFromApi(
     body.limit = Math.max(1, Math.min(200, query.per_source_limit));
   }
 
-  // BYOK: if the user has a Bright Data key configured locally and wants X,
+  // BYOK: if the user has an Orthogonal key configured locally and wants X,
   // forward the creds inside the body. The server forgets them after the call.
-  const bdKey = config.brightdata_api_key;
-  const bdDataset =
-    config.brightdata_dataset_id ??
-    readEnv("BRIGHTDATA_DATASET_ID") ??
-    readEnv("BRIGHTDATA_DATASET_ID_X_POSTS");
-  if (x_handles.length > 0 && bdKey && bdDataset) {
-    body.creds = { brightdata: { api_key: bdKey, dataset_id: bdDataset } };
+  if (x_handles.length > 0 && config.orthogonal_api_key) {
+    body.creds = { orthogonal: { api_key: config.orthogonal_api_key } };
   }
 
   const url = `${target.url}/v1/scrape`;
@@ -120,7 +115,7 @@ export async function fetchFromApi(
   if (statusCode === 429) {
     const text = await resBody.text().catch(() => "");
     throw new Error(
-      `notslop-api rate-limited: ${text.slice(0, 200)} — provide your own Bright Data key to skip the hosted quota`,
+      `notslop-api rate-limited: ${text.slice(0, 200)} — provide your own Orthogonal key to skip the hosted quota`,
     );
   }
   if (statusCode < 200 || statusCode >= 300) {

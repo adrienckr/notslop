@@ -3,7 +3,7 @@
  *
  * Walks a first-time user through:
  *   1. Acquiring a ZeroEntropy API key (links to dashboard)
- *   2. Optionally configuring Bright Data for X / Twitter
+ *   2. Optionally configuring Orthogonal for X / Twitter
  *   3. Listing competitor blogs and default subreddits
  *
  * Writes the resulting Config to ~/.notslop/config.json via `saveConfig`.
@@ -14,7 +14,7 @@ import kleur from "kleur";
 
 import { DEFAULT_CONFIG_PATH, saveConfig } from "../config.js";
 import { printBanner, printDim, printError } from "../output.js";
-import { BRIGHTDATA_SIGNUP_URL, zeDashboardUrl } from "../telemetry.js";
+import { ORTHOGONAL_SIGNUP_URL, zeDashboardUrl } from "../telemetry.js";
 import { type Config, DEFAULT_CONFIG } from "../types.js";
 
 function splitCsv(raw: string): string[] {
@@ -61,40 +61,24 @@ export async function initCommand(): Promise<void> {
     });
 
     writeln();
-    writeln(kleur.bold("Bright Data API key (optional — only for X / Twitter scraping)."));
-    writeln(kleur.dim(`  → Get one at ${BRIGHTDATA_SIGNUP_URL} → Settings → API`));
-    writeln(
-      kleur.dim("  → Costs ~$0.001 per post scraped. ~$15/month for 50 handles × daily refresh."),
-    );
-    writeln(kleur.dim("  → Skip if you only want Reddit/HN/blogs (covers ~95% of AI/dev signal)."));
+    writeln(kleur.bold("Orthogonal API key (optional — only for X / Twitter scraping)."));
+    writeln(kleur.dim(`  → Get one at ${ORTHOGONAL_SIGNUP_URL}`));
+    writeln(kleur.dim("  → $10 free credits at signup = ~500 X handle scrapes free"));
+    writeln(kleur.dim("  → Costs ~$0.02 per handle scrape after the free tier"));
+    writeln(kleur.dim("  → Skip if you only want Reddit/HN/blogs (covers ~95% of AI/dev signal)"));
     writeln();
 
-    const bdRaw = await password({
-      message: "Enter your Bright Data API key (press Enter to skip):",
+    const orthRaw = await password({
+      message: "Enter your Orthogonal API key (press Enter to skip):",
       mask: "*",
       validate: () => true,
     });
 
-    let brightDataKey: string | undefined;
+    let orthogonalKey: string | undefined;
     let xProfiles: string[] = [];
-    let brightDataDatasetId: string | undefined;
-    const bdKeyTrimmed = bdRaw.trim();
-    if (bdKeyTrimmed.length > 0) {
-      brightDataKey = bdKeyTrimmed;
-
-      writeln();
-      writeln(kleur.bold("Bright Data dataset ID for X — Posts by URL."));
-      writeln(
-        kleur.dim('  → Find it in your Bright Data dashboard → Datasets → "X — Posts by URL"'),
-      );
-      writeln(kleur.dim("  → Format: gd_xxxxxxxxxxxxxx"));
-      writeln();
-
-      const datasetRaw = await input({
-        message: "Enter your Bright Data dataset ID:",
-        default: "",
-      });
-      brightDataDatasetId = datasetRaw.trim() || undefined;
+    const orthKeyTrimmed = orthRaw.trim();
+    if (orthKeyTrimmed.length > 0) {
+      orthogonalKey = orthKeyTrimmed;
 
       writeln();
       const handles = await input({
@@ -124,8 +108,7 @@ export async function initCommand(): Promise<void> {
     const config: Config = {
       ...DEFAULT_CONFIG,
       zeroentropy_api_key: zeKey.trim(),
-      brightdata_api_key: brightDataKey,
-      brightdata_dataset_id: brightDataDatasetId,
+      orthogonal_api_key: orthogonalKey,
       x_profiles: xProfiles,
       blogs,
       subreddits,

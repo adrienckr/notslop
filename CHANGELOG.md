@@ -3,6 +3,38 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.8.0] — 2026-05-13
+
+### Changed (breaking)
+
+- **X scraping switched from Bright Data to Orthogonal (ScrapeCreators).** One
+  signup, one key, no dataset ID, no $50 minimum top-up. $10 of credits at signup
+  covers ~500 X handle scrapes; pay-as-you-go (~$0.02/handle) after that.
+- `BRIGHTDATA_API_KEY` and `BRIGHTDATA_DATASET_ID` env vars are gone. Replaced by
+  `ORTHOGONAL_API_KEY`. Same for `~/.notslop/config.json` — `brightdata_api_key` +
+  `brightdata_dataset_id` removed, `orthogonal_api_key` added.
+- The wizard prompt collapsed from two Bright Data fields to a single Orthogonal
+  prompt with signup URL + free-tier hint.
+
+### Why
+
+Bright Data forced users through a separate billing flow, a confusing "subscribe
+to the right dataset" step, and a $10–50 minimum top-up before anything worked.
+Orthogonal collapses the same data behind a single key with $10 free credits up
+front. Same data quality (ScrapeCreators is what's behind both), simpler
+onboarding. Sets up future Reddit/LinkedIn/TikTok scraping behind the same key.
+
+### Migration
+
+If you already had Bright Data wired:
+1. Sign up at https://orthogonal.com/sign-up
+2. Re-run `notslop init` and paste the new `orth_live_...` key (or
+   `export ORTHOGONAL_API_KEY=...`).
+3. `notslop sources --check x` to verify.
+
+The hosted `notslop-api` rejects `creds.brightdata` (gone from the schema).
+Clients on v0.7.x with `--api` mode pointed at the hosted instance must upgrade.
+
 ## [0.7.0] — 2026-05-13
 
 ### Added — per-source provider documentation

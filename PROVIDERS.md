@@ -9,7 +9,7 @@ to get the key, what it costs, and how to set it.
 | If you want to use… | You need | Cost |
 |---|---|---|
 | Reddit, HN, blogs (default) | nothing | free |
-| X (Twitter) | a Bright Data account + the X dataset | ~$0.001 per post |
+| X (Twitter) | an Orthogonal account | $10 free → ~$0.02/scrape |
 | Rerank + embed (recommended) | a ZeroEntropy account | free tier covers most |
 
 If you don't care about X scraping, the only key you need is ZeroEntropy. That's
@@ -41,48 +41,47 @@ the minimum to ship.
 - Works with any feed (RSS, Atom). For sites without a feed, the scraper falls back
   to scraping article links from the landing page.
 
-## X (Twitter) — via Bright Data
+## X (Twitter) — via Orthogonal
 
-**Requires a Bright Data account + the X Posts dataset.**
+**Requires an Orthogonal account.**
+
+Orthogonal is a unified API gateway. You sign up once, get one key, and it proxies
+to ScrapeCreators (which handles X scraping, plus Reddit/LinkedIn/TikTok/etc. for
+future skills).
 
 ### Step-by-step setup
 
-1. Sign up at https://brightdata.com (free signup, payment method required to
-   activate API access).
-2. Add credits to your account — minimum top-up is typically ~$10. X scraping
-   costs roughly **$0.001 per post** at the default plan. A daily scrape of
-   50 handles × 10 posts = $0.50/day = ~$15/month.
-3. Go to **Datasets** in the left nav, click **Browse Datasets**, find
-   **X (Twitter) — Posts by URL** (or "by array of profiles" — same data).
-4. Click **Subscribe** (free, you only pay per record scraped).
-5. From the dataset page, copy the **Dataset ID** — format `gd_xxxxxxxxxxxxxx`.
-6. Go to **Settings → API** in Bright Data dashboard, copy your **API key**
-   (long alphanumeric string, sometimes with hyphens).
-7. Set both:
+1. Sign up at https://orthogonal.com/sign-up (GitHub login). $10 free credits.
+2. Copy your API key from the dashboard (format: `orth_live_xxxxxxxxxxxx`).
+3. Set it:
    ```bash
-   export BRIGHTDATA_API_KEY=your_key_here
-   export BRIGHTDATA_DATASET_ID=gd_xxxxxxxxxxxxxx
+   export ORTHOGONAL_API_KEY=orth_live_xxxxxxxxxxxx
    ```
-   Or put them in `~/.notslop/config.json` via `notslop init`.
+   Or put it in `~/.notslop/config.json` via `notslop init`.
 
-### Verify it works
+### Cost
+
+- ~$0.02 per handle scrape (10 tweets returned per call).
+- $10 free credits at signup ≈ 500 handle scrapes.
+- Pay-as-you-go after the free tier.
+
+### Verify
 
 ```bash
 notslop sources --check x
-# expected: ✔ X scrape live-tested via @karpathy (2-3 minutes due to async API)
+# expected: ✔ X scrape via Orthogonal ScrapeCreators (priceCents: 2)
 ```
 
-### Why Bright Data and not the official X API?
+### Why Orthogonal and not the official X API?
 
-The official X API costs $200/month minimum (Basic tier) and has heavy rate
-limits. Bright Data's Datasets API is async (30s–5min per call) but charges
-per record and handles the bot-detection bypass on their side.
+X API is $200/month minimum. Bright Data is functional but asks you to manage
+a dataset_id and a separate billing flow. Orthogonal collapses 20+ social
+scraping providers into a single key — easier onboarding, same data quality.
 
-### Alternatives (not yet wired, v0.7+ roadmap)
+### Alternatives (v0.8+ roadmap)
 
-- **Apify** — `apify/twitter-scraper` actor, similar pricing.
-- **Custom Playwright + camoufox + residential proxies** — DIY, much cheaper at
-  scale but a maintenance burden.
+When notslop adds Reddit / LinkedIn / TikTok scraping via Orthogonal (instead
+of just X), the same Orthogonal key will cover all of them.
 
 ## ZeroEntropy (rerank + embed)
 
@@ -144,7 +143,7 @@ as a Fly secret.
 | Where | How |
 |---|---|
 | Local dev (CLI) | `notslop init` (writes to `~/.notslop/config.json`) or env vars |
-| Self-hosted notslop-api (Fly) | `fly secrets set BRIGHTDATA_API_KEY=...` |
+| Self-hosted notslop-api (Fly) | `fly secrets set ORTHOGONAL_API_KEY=...` |
 | Self-hosted notslop-api (other) | `.env` file or your platform's secret manager |
 | Hosted notslop-api (via the CLI's `--api` flag) | The CLI forwards keys from your local config inside each `POST /v1/scrape` body. The server never persists them. |
 
@@ -157,10 +156,11 @@ For a typical content-creation workflow (50 handles, 10 posts each, 1 scrape/day
 | Component | Provider | Monthly cost |
 |---|---|---|
 | Reddit / HN / blogs | free | $0 |
-| X scraping | Bright Data | ~$15 |
+| X scraping (50 handles × daily) | Orthogonal | ~$30 (after $10 free credits) |
 | Rerank (~1000 calls/mo) | ZeroEntropy | likely free tier |
 | Embed (cached forever, ~10k unique posts/mo) | ZeroEntropy | likely free tier |
-| **Total** | | **~$15/mo** |
+| **Total** | | **~$30/mo** |
 
-You can run notslop fully free if you skip X. Reddit + HN + blogs cover ~95%
-of the AI/dev signal anyway.
+The first ~500 X handle scrapes are free (the signup credit). You can run notslop
+fully free if you skip X — Reddit + HN + blogs cover ~95% of the AI/dev signal
+anyway.

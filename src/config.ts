@@ -2,7 +2,7 @@
  * User config: load / save / merge with env overrides.
  *
  * Default location: ~/.notslop/config.json
- * Env overrides: ZEROENTROPY_API_KEY, BRIGHTDATA_API_KEY
+ * Env overrides: ZEROENTROPY_API_KEY, ORTHOGONAL_API_KEY
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -37,11 +37,8 @@ export function loadConfig(options: LoadConfigOptions = {}): Config {
   if (process.env.ZEROENTROPY_API_KEY) {
     envOverrides.zeroentropy_api_key = process.env.ZEROENTROPY_API_KEY;
   }
-  if (process.env.BRIGHTDATA_API_KEY) {
-    envOverrides.brightdata_api_key = process.env.BRIGHTDATA_API_KEY;
-  }
-  if (process.env.BRIGHTDATA_DATASET_ID) {
-    envOverrides.brightdata_dataset_id = process.env.BRIGHTDATA_DATASET_ID;
+  if (process.env.ORTHOGONAL_API_KEY) {
+    envOverrides.orthogonal_api_key = process.env.ORTHOGONAL_API_KEY;
   }
 
   return { ...DEFAULT_CONFIG, ...fromFile, ...envOverrides };

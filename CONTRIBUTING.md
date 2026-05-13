@@ -23,7 +23,7 @@ to exercise the rerank path locally.
 ```
 bin/notslop.ts            CLI entry point (commander definitions)
 src/commands/             One file per command (digest, trending, pulse, voices, init)
-src/platforms/            One file per source (reddit, hn, blogs, x_brightdata)
+src/platforms/            One file per source (reddit, hn, blogs, x_orthogonal)
 src/rerank/               ZeroEntropy zerank-2 client
 src/cache.ts              SQLite-backed cache with TTL
 src/config.ts             Config load/save, env overrides

@@ -1,6 +1,6 @@
 {
   "name": "notslop",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "No more AI slop. Real-time social context for AI agents to ground their content in what's happening today.",
   "type": "module",
   "bin": {

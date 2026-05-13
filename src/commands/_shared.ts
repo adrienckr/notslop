@@ -15,7 +15,7 @@ import type { Platform } from "../platforms/_base.js";
 import { blogsPlatform } from "../platforms/blogs.js";
 import { hnPlatform } from "../platforms/hn.js";
 import { redditPlatform } from "../platforms/reddit.js";
-import { xBrightdataPlatform } from "../platforms/x_brightdata.js";
+import { xOrthogonalPlatform } from "../platforms/x_orthogonal.js";
 
 import { DEFAULT_CONFIG_PATH, configExists, loadConfig } from "../config.js";
 import type { PrintMeta } from "../output.js";
@@ -43,7 +43,7 @@ export const ALL_PLATFORMS: readonly Platform[] = [
   redditPlatform,
   hnPlatform,
   blogsPlatform,
-  xBrightdataPlatform,
+  xOrthogonalPlatform,
 ] as const;
 
 const VALID_DURATIONS: readonly DurationToken[] = ["1h", "6h", "24h", "7d", "30d", "all"] as const;

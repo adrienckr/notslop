@@ -10,7 +10,7 @@ description: Pull a multi-source social digest (Reddit, Hacker News, blogs, X) o
 | Pull social signal (Reddit/HN/blogs) | yes | built-in, no key needed | — | free |
 | Rerank by relevance | yes | ZeroEntropy `zerank-2` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
 | Embed for cross-source dedup | yes | ZeroEntropy `zembed-1` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
-| Scrape X posts | **only if topic needs X data** | Bright Data Datasets API | [PROVIDERS.md#x-twitter--via-bright-data](../../PROVIDERS.md#x-twitter--via-bright-data) | ~$0.001/post |
+| Scrape X posts | **only if topic needs X data** | Orthogonal (ScrapeCreators) | [PROVIDERS.md#x-twitter--via-orthogonal](../../PROVIDERS.md#x-twitter--via-orthogonal) | ~$0.02/handle, $10 free at signup |
 
 # When to use this skill
 
@@ -28,7 +28,7 @@ If the user wants raw trending volume rather than a curated read, prefer `notslo
 The user must have run `npx notslop init` and configured:
 
 - A ZeroEntropy API key (free at https://dashboard.zeroentropy.dev).
-- Optionally: a list of X handles, a list of blog URLs, and a Bright Data API key (only needed for the X source).
+- Optionally: a list of X handles, a list of blog URLs, and an Orthogonal API key (only needed for the X source).
 
 If config is missing, the CLI prints an actionable error. Surface it to the user verbatim and stop.
 

@@ -1,6 +1,6 @@
 {
   "zeroentropy_api_key": "ze_xxxxxxxxxxxxxxxxx",
-  "brightdata_api_key": "bd_xxxxxxxxxxxxxxxxx",
+  "orthogonal_api_key": "orth_live_xxxxxxxxxxxx",
   "x_profiles": ["karpathy", "sama", "AnthropicAI", "OpenAI", "yann_lecun"],
   "blogs": [
     "https://anthropic.com/news",

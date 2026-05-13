@@ -70,9 +70,8 @@ export interface NamedList {
 
 export interface Config {
   zeroentropy_api_key?: string;
-  brightdata_api_key?: string;
-  /** Bright Data dataset id for the X — Posts by URL dataset, e.g. `gd_lwxk...`. */
-  brightdata_dataset_id?: string;
+  /** Orthogonal API key (format `orth_live_xxxx`) — used for X (Twitter) scraping. */
+  orthogonal_api_key?: string;
   x_profiles: string[];
   blogs: string[];
   subreddits: string[];

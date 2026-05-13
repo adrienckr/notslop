@@ -17,7 +17,6 @@ import { embedTexts } from "../embed/zeroentropy.js";
 import { printError } from "../output.js";
 import { fetchHnSearch } from "../platforms/hn.js";
 import { fetchRedditSearch } from "../platforms/reddit.js";
-import { xBrightdataPlatform } from "../platforms/x_brightdata.js";
 import { rerank } from "../rerank/zeroentropy.js";
 import type { Config, FetchQuery, Post } from "../types.js";
 
@@ -103,22 +102,20 @@ function printStatus(config: Config, configPath: string | undefined): void {
   writeln();
 
   writeln(`  ${kleur.bold().white("X (Twitter):")}`);
-  if (config.brightdata_api_key) {
-    const datasetId =
-      config.brightdata_dataset_id ?? process.env.BRIGHTDATA_DATASET_ID ?? "(default dataset)";
+  if (config.orthogonal_api_key) {
     writeln(
-      `  ${checkmark()} ${kleur.bold("bright_data".padEnd(14, " "))} ${kleur.dim(
-        `BRIGHTDATA_API_KEY set (${maskKey(config.brightdata_api_key)}) · dataset ${datasetId}`,
+      `  ${checkmark()} ${kleur.bold("orthogonal".padEnd(14, " "))} ${kleur.dim(
+        `ORTHOGONAL_API_KEY set (${maskKey(config.orthogonal_api_key)})`,
       )}`,
     );
     writeln(`      ${kleur.dim(`${config.x_profiles.length} X handles configured`)}`);
   } else {
-    writeln(`  ${cross()} ${kleur.bold("bright_data".padEnd(14, " "))}`);
-    writeln(`      ${kleur.red("BRIGHTDATA_API_KEY missing.")}`);
-    writeln(`      ${kleur.dim("→ Sign up:")} ${kleur.cyan("https://brightdata.com")}`);
+    writeln(`  ${cross()} ${kleur.bold("orthogonal".padEnd(14, " "))}`);
+    writeln(`      ${kleur.red("ORTHOGONAL_API_KEY missing.")}`);
+    writeln(`      ${kleur.dim("→ Sign up:")} ${kleur.cyan("https://orthogonal.com/sign-up")}`);
     writeln(
       `      ${kleur.dim("→ Setup guide:")} ${kleur.cyan(
-        "PROVIDERS.md#x-twitter--via-bright-data",
+        "PROVIDERS.md#x-twitter--via-orthogonal",
       )}`,
     );
     writeln(`      ${kleur.dim("→ Skip X scraping if you only want Reddit/HN/blogs.")}`);
@@ -280,9 +277,9 @@ async function checkBlogs(config: Config): Promise<void> {
 }
 
 async function checkX(config: Config): Promise<void> {
-  if (!config.brightdata_api_key) {
-    writeln(`${cross()} ${kleur.bold("x")}: BRIGHTDATA_API_KEY missing.`);
-    writeln(kleur.dim("  → Setup guide: PROVIDERS.md#x-twitter--via-bright-data"));
+  if (!config.orthogonal_api_key) {
+    writeln(`${cross()} ${kleur.bold("x")}: ORTHOGONAL_API_KEY missing.`);
+    writeln(kleur.dim("  → Setup guide: PROVIDERS.md#x-twitter--via-orthogonal"));
     writeln(
       kleur.dim(
         "  → Without this key, X scraping is disabled. The CLI still works for Reddit/HN/blogs.",
@@ -290,27 +287,58 @@ async function checkX(config: Config): Promise<void> {
     );
     process.exit(1);
   }
-  const handle = config.x_profiles[0] ?? "karpathy";
+  const handle = (config.x_profiles[0] ?? "karpathy").replace(/^@/, "");
   const spinner = ora({
-    text: `x: live-testing @${handle} via Bright Data (30s–5min, async API)…`,
+    text: `x: live-testing @${handle} via Orthogonal ScrapeCreators…`,
     spinner: "dots",
   }).start();
   try {
-    const query: FetchQuery = {
-      query: "",
-      since: "30d",
-      per_source_limit: 1,
-      x_profiles: [handle],
-    };
-    const posts = await xBrightdataPlatform.fetch(query, config);
+    const { statusCode, body } = await request("https://api.orthogonal.com/v1/run", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.orthogonal_api_key}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        api: "scrapecreators",
+        path: "/v1/twitter/user-tweets",
+        query: { handle, trim: "true" },
+      }),
+    });
+    const text = await body.text();
     spinner.stop();
+    if (statusCode < 200 || statusCode >= 300) {
+      writeln(
+        `${cross()} ${kleur.bold("x")}: Orthogonal HTTP ${statusCode} — ${kleur.red(text.slice(0, 200))}`,
+      );
+      writeln(kleur.dim("  → Setup guide: PROVIDERS.md#x-twitter--via-orthogonal"));
+      process.exit(1);
+    }
+    let priceCents: number | undefined;
+    let tweetCount: number | undefined;
+    let creditsRemaining: number | undefined;
+    try {
+      const parsed = JSON.parse(text) as {
+        priceCents?: number;
+        data?: { tweets?: unknown[]; credits_remaining?: number };
+      };
+      priceCents = parsed.priceCents;
+      tweetCount = Array.isArray(parsed.data?.tweets) ? parsed.data?.tweets.length : undefined;
+      creditsRemaining = parsed.data?.credits_remaining;
+    } catch {
+      // fall through — we still passed the auth check
+    }
+    const priceSuffix = priceCents !== undefined ? `, priceCents: ${priceCents}` : "";
+    const creditSuffix =
+      creditsRemaining !== undefined ? `, credits_remaining: ${creditsRemaining}` : "";
     writeln(
-      `${checkmark()} ${kleur.bold("x")}: live test passed (${posts.length} posts via @${handle})`,
+      `${checkmark()} ${kleur.bold("x")}: X scrape via Orthogonal ScrapeCreators (${tweetCount ?? "?"} tweets via @${handle}${priceSuffix}${creditSuffix})`,
     );
   } catch (err) {
     spinner.stop();
     writeln(`${cross()} ${kleur.bold("x")}: ${kleur.red((err as Error).message)}`);
-    writeln(kleur.dim("  → Setup guide: PROVIDERS.md#x-twitter--via-bright-data"));
+    writeln(kleur.dim("  → Setup guide: PROVIDERS.md#x-twitter--via-orthogonal"));
     process.exit(1);
   }
 }

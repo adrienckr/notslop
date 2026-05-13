@@ -57,7 +57,7 @@ program
     "after",
     `
 How it works:
-  1. CLI fetches raw posts from Reddit + HN + blogs (RSS) + X (Bright Data).
+  1. CLI fetches raw posts from Reddit + HN + blogs (RSS) + X (Orthogonal).
   2. ZeroEntropy  zembed-1  dedups near-duplicates across sources (cosine > 0.85).
   3. ZeroEntropy  zerank-2  reranks candidates by semantic relevance to your topic.
   4. Output is the top-N reranked posts — your agent grounds its writing in real signal.
