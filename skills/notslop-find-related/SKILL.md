@@ -3,6 +3,14 @@ name: notslop-find-related
 description: Use when the user wants to find recent posts semantically similar to a piece of content (URL or text). Embeds the input + ranks candidates across Reddit / HN / blogs / X by cosine similarity. Use for repurpose workflows or "what else is being said about this" research.
 ---
 
+## Providers required
+
+| Capability | Required | Providers (BYOK) | Setup | Cost |
+|---|---|---|---|---|
+| Pull social signal (Reddit/HN/blogs) | yes | built-in, no key needed | — | free |
+| Embed for cosine similarity | yes | ZeroEntropy `zembed-1` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Scrape X posts | **only if topic needs X data** | Bright Data Datasets API | [PROVIDERS.md#x-twitter--via-bright-data](../../PROVIDERS.md#x-twitter--via-bright-data) | ~$0.001/post |
+
 # When to use this skill
 
 - "Find related discussions to <url>"

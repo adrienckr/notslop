@@ -71,6 +71,8 @@ export interface NamedList {
 export interface Config {
   zeroentropy_api_key?: string;
   brightdata_api_key?: string;
+  /** Bright Data dataset id for the X — Posts by URL dataset, e.g. `gd_lwxk...`. */
+  brightdata_dataset_id?: string;
   x_profiles: string[];
   blogs: string[];
   subreddits: string[];

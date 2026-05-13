@@ -3,6 +3,35 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.7.0] — 2026-05-13
+
+### Added — per-source provider documentation
+
+- **`PROVIDERS.md`** at the repo root — directory of every source/provider notslop
+  touches (Reddit, HN, blogs, X via Bright Data, ZeroEntropy for rerank/embed).
+  For each one: what it does, whether a key is required, where to get the key,
+  what it costs, how to set it, how to verify it works.
+- **`## Providers required` table on every `SKILL.md`** (all 19 skills). Each
+  skill now spells out exactly which capabilities it needs (pull signal / rerank /
+  embed / scrape X) and links straight to the relevant `PROVIDERS.md` section.
+  Cold-DM is the only skill that requires X explicitly (it needs to read the
+  recipient's recent posts); the rest mark X as optional.
+- **`notslop sources` command** — prints the live status of every source on the
+  user's machine. For each missing key it shows the setup link, the env var name,
+  and the one-liner to skip if the user doesn't want that source. `--check <name>`
+  live-tests a single source with a small actual call.
+- **`init` wizard rewrite** — every prompt now includes a one-line description,
+  cost estimate, signup URL, and an explicit "press Enter to skip" hint. New
+  dedicated prompt for the Bright Data dataset ID (previously env-only).
+- **README `## Sources & providers` section** — TL;DR table + pointer to
+  `PROVIDERS.md`. Quick `notslop sources` callout.
+
+### Changed
+
+- `Config.brightdata_dataset_id` is now a first-class field (was previously
+  env-only via `BRIGHTDATA_DATASET_ID`). The wizard captures it, and the X
+  platform + `--api` client both read it from config before falling back to env.
+
 ## [0.6.0] — 2026-05-13
 
 ### Added — 7 new content-creation skills

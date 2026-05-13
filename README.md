@@ -180,6 +180,19 @@ The gateway is **stateless** — it never sees your ZeroEntropy key (rerank runs
 
 ---
 
+## Sources & providers
+
+| If you want to use… | You need | Cost |
+|---|---|---|
+| Reddit, HN, blogs (default) | nothing | free |
+| X (Twitter) | a Bright Data account + the X dataset | ~$0.001 per post |
+| Rerank + embed (recommended) | a ZeroEntropy account | free tier covers most |
+
+ZeroEntropy is the only required key — skip X and Reddit/HN/blogs still cover
+~95% of AI/dev signal. Full per-source setup walkthroughs are in
+[PROVIDERS.md](./PROVIDERS.md). Run `notslop sources` to see what's wired and
+what's missing on your machine; `notslop sources --check x` live-tests a source.
+
 ## Configuration
 
 `notslop init` writes `~/.notslop/config.json`. Env overrides for the values you'd rotate:

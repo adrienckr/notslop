@@ -9,7 +9,7 @@
  * Writes the resulting Config to ~/.notslop/config.json via `saveConfig`.
  */
 
-import { confirm, input, password } from "@inquirer/prompts";
+import { input, password } from "@inquirer/prompts";
 import kleur from "kleur";
 
 import { DEFAULT_CONFIG_PATH, saveConfig } from "../config.js";
@@ -40,20 +40,18 @@ export async function initCommand(): Promise<void> {
     banner();
 
     const dashboardUrl = zeDashboardUrl("init-wizard");
-    const openDashboard = await confirm({
-      message: "Open dashboard.zeroentropy.dev to grab a free API key now?",
-      default: true,
-    });
-    if (openDashboard) {
-      writeln();
-      writeln(kleur.bold("Visit:"));
-      writeln(`  ${kleur.underline().cyan(dashboardUrl)}`);
-      writeln(kleur.dim("Create a key, then come back here to paste it."));
-      writeln();
-    }
+    writeln(
+      kleur.bold("ZeroEntropy API key (required for rerank + embed — the heart of notslop)."),
+    );
+    writeln(kleur.dim(`  → Get one free at ${dashboardUrl}`));
+    writeln(kleur.dim("  → Free tier covers ~3000 calls/month."));
+    writeln(
+      kleur.dim("  → Skip with empty input only if you plan to set ZEROENTROPY_API_KEY via env."),
+    );
+    writeln();
 
     const zeKey = await password({
-      message: "Paste your ZeroEntropy API key:",
+      message: "Enter your ZeroEntropy API key:",
       mask: "*",
       validate: (value) => {
         const trimmed = value.trim();
@@ -62,26 +60,43 @@ export async function initCommand(): Promise<void> {
       },
     });
 
-    const wantBrightData = await confirm({
-      message: "Configure Bright Data now for X (Twitter) access? You can skip and add later.",
-      default: false,
+    writeln();
+    writeln(kleur.bold("Bright Data API key (optional — only for X / Twitter scraping)."));
+    writeln(kleur.dim(`  → Get one at ${BRIGHTDATA_SIGNUP_URL} → Settings → API`));
+    writeln(
+      kleur.dim("  → Costs ~$0.001 per post scraped. ~$15/month for 50 handles × daily refresh."),
+    );
+    writeln(kleur.dim("  → Skip if you only want Reddit/HN/blogs (covers ~95% of AI/dev signal)."));
+    writeln();
+
+    const bdRaw = await password({
+      message: "Enter your Bright Data API key (press Enter to skip):",
+      mask: "*",
+      validate: () => true,
     });
 
     let brightDataKey: string | undefined;
     let xProfiles: string[] = [];
-    if (wantBrightData) {
+    let brightDataDatasetId: string | undefined;
+    const bdKeyTrimmed = bdRaw.trim();
+    if (bdKeyTrimmed.length > 0) {
+      brightDataKey = bdKeyTrimmed;
+
       writeln();
-      writeln(kleur.bold("Bright Data signup:"));
-      writeln(`  ${kleur.underline().cyan(BRIGHTDATA_SIGNUP_URL)}`);
+      writeln(kleur.bold("Bright Data dataset ID for X — Posts by URL."));
+      writeln(
+        kleur.dim('  → Find it in your Bright Data dashboard → Datasets → "X — Posts by URL"'),
+      );
+      writeln(kleur.dim("  → Format: gd_xxxxxxxxxxxxxx"));
       writeln();
 
-      const bdRaw = await password({
-        message: "Paste your Bright Data API key:",
-        mask: "*",
-        validate: (value) => (value.trim().length === 0 ? "key cannot be empty" : true),
+      const datasetRaw = await input({
+        message: "Enter your Bright Data dataset ID:",
+        default: "",
       });
-      brightDataKey = bdRaw.trim();
+      brightDataDatasetId = datasetRaw.trim() || undefined;
 
+      writeln();
       const handles = await input({
         message: "X handles to track (comma-separated, with or without @):",
         default: "",
@@ -110,6 +125,7 @@ export async function initCommand(): Promise<void> {
       ...DEFAULT_CONFIG,
       zeroentropy_api_key: zeKey.trim(),
       brightdata_api_key: brightDataKey,
+      brightdata_dataset_id: brightDataDatasetId,
       x_profiles: xProfiles,
       blogs,
       subreddits,

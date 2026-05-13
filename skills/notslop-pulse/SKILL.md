@@ -3,6 +3,15 @@ name: notslop-pulse
 description: Track mentions of a topic across Reddit, Hacker News, blogs, and X over a multi-day window. Use when the user wants to know whether something is getting picked up, how mentions are trending, or to monitor a launch/release over time.
 ---
 
+## Providers required
+
+| Capability | Required | Providers (BYOK) | Setup | Cost |
+|---|---|---|---|---|
+| Pull social signal (Reddit/HN/blogs) | yes | built-in, no key needed | — | free |
+| Rerank by relevance | yes | ZeroEntropy `zerank-2` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Embed for theme clustering | yes | ZeroEntropy `zembed-1` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Scrape X posts | **only if topic needs X data** | Bright Data Datasets API | [PROVIDERS.md#x-twitter--via-bright-data](../../PROVIDERS.md#x-twitter--via-bright-data) | ~$0.001/post |
+
 # When to use this skill
 
 Activate when the user prompt sounds like any of:

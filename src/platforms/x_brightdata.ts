@@ -25,8 +25,8 @@ const SNAPSHOT_BASE = "https://api.brightdata.com/datasets/v3/snapshot";
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 60_000;
 
-function datasetId(): string {
-  return process.env.BRIGHTDATA_DATASET_ID ?? DEFAULT_DATASET_ID;
+function datasetId(config: Config): string {
+  return config.brightdata_dataset_id ?? process.env.BRIGHTDATA_DATASET_ID ?? DEFAULT_DATASET_ID;
 }
 
 function authHeaders(apiKey: string): Record<string, string> {
@@ -130,8 +130,8 @@ function matchesQueryTerms(description: string, query: string): boolean {
   return terms.every((t) => haystack.includes(t));
 }
 
-async function triggerSnapshot(apiKey: string, urls: string[]): Promise<string> {
-  const triggerUrl = `${TRIGGER_BASE}?dataset_id=${encodeURIComponent(datasetId())}`;
+async function triggerSnapshot(apiKey: string, urls: string[], config: Config): Promise<string> {
+  const triggerUrl = `${TRIGGER_BASE}?dataset_id=${encodeURIComponent(datasetId(config))}`;
   const { statusCode, body } = await request(triggerUrl, {
     method: "POST",
     headers: authHeaders(apiKey),
@@ -250,7 +250,7 @@ async function fetchTweetsForProfiles(
     return `https://x.com/${clean}`;
   });
 
-  const snapshotId = await triggerSnapshot(apiKey, urls);
+  const snapshotId = await triggerSnapshot(apiKey, urls, config);
   const tweets = await pollSnapshot(apiKey, snapshotId);
   cacheSet(key, tweets, config.cache_ttl_seconds);
   return tweets;

@@ -17,6 +17,7 @@ import { initCommand } from "../src/commands/init.js";
 import { installCommand } from "../src/commands/install.js";
 import { listCommand } from "../src/commands/list.js";
 import { pulseCommand } from "../src/commands/pulse.js";
+import { sourcesCommand } from "../src/commands/sources.js";
 import { trendingCommand } from "../src/commands/trending.js";
 import { voicesCommand } from "../src/commands/voices.js";
 import { printBanner, printError } from "../src/output.js";
@@ -176,6 +177,15 @@ program
   .option("--config <path>", "override config file path")
   .action(async (topic: string, opts) => {
     await voicesCommand(topic, opts);
+  });
+
+program
+  .command("sources")
+  .description("Show status of every scraping source + rerank provider (missing keys, setup links)")
+  .option("--check <name>", "Live-test one source: reddit | hn | blogs | x | zeroentropy")
+  .option("--config <path>", "override config file path")
+  .action(async (opts) => {
+    await sourcesCommand(opts);
   });
 
 program

@@ -40,6 +40,9 @@ export function loadConfig(options: LoadConfigOptions = {}): Config {
   if (process.env.BRIGHTDATA_API_KEY) {
     envOverrides.brightdata_api_key = process.env.BRIGHTDATA_API_KEY;
   }
+  if (process.env.BRIGHTDATA_DATASET_ID) {
+    envOverrides.brightdata_dataset_id = process.env.BRIGHTDATA_DATASET_ID;
+  }
 
   return { ...DEFAULT_CONFIG, ...fromFile, ...envOverrides };
 }

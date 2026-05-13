@@ -3,6 +3,15 @@ name: notslop-write-reddit-reply
 description: Use when the user wants to write a reply to an existing Reddit thread. Reads the thread + sub culture, drafts a comment grounded in current context.
 ---
 
+## Providers required
+
+| Capability | Required | Providers (BYOK) | Setup | Cost |
+|---|---|---|---|---|
+| Pull social signal (Reddit/HN/blogs) | yes | built-in, no key needed | — | free |
+| Rerank by relevance | yes | ZeroEntropy `zerank-2` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Embed for cross-source dedup | yes | ZeroEntropy `zembed-1` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Scrape X posts | no | — | — | — |
+
 # When to use this skill
 
 - "Reply to <reddit URL>"

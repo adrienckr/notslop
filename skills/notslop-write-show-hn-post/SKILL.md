@@ -3,6 +3,15 @@ name: notslop-write-show-hn-post
 description: Use when the user wants to write a Show HN launch post for a new project / tool / library / SaaS. Pulls the room temperature of recent successful Show HN posts in the same niche to ground tone + format. Produces a title (<80 chars) and a body that includes problem, what-it-does, stack, demo URL, repo URL.
 ---
 
+## Providers required
+
+| Capability | Required | Providers (BYOK) | Setup | Cost |
+|---|---|---|---|---|
+| Pull social signal (Reddit/HN/blogs) | yes | built-in, no key needed | — | free |
+| Rerank by relevance | yes | ZeroEntropy `zerank-2` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Embed for cross-source dedup | yes | ZeroEntropy `zembed-1` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Scrape X posts | no | — | — | — |
+
 # When to use this skill
 
 - "Write me a Show HN post for X"

@@ -3,6 +3,15 @@ name: notslop-write-blog-post
 description: Use when the user wants to write a long-form blog post (1500-3000 words) on a topic. Pulls a week of social signal, clusters it into themes, identifies undercovered angles, then produces an SEO-aware article with per-section word counts, E-E-A-T citations of real posts, and citation-ready structure for AI Overviews.
 ---
 
+## Providers required
+
+| Capability | Required | Providers (BYOK) | Setup | Cost |
+|---|---|---|---|---|
+| Pull social signal (Reddit/HN/blogs) | yes | built-in, no key needed | — | free |
+| Rerank by relevance | yes | ZeroEntropy `zerank-2` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Embed for theme clusters + dedup | yes | ZeroEntropy `zembed-1` | [PROVIDERS.md#zeroentropy-rerank--embed](../../PROVIDERS.md#zeroentropy-rerank--embed) | free tier OK |
+| Scrape X posts | **only if topic needs X data** | Bright Data Datasets API | [PROVIDERS.md#x-twitter--via-bright-data](../../PROVIDERS.md#x-twitter--via-bright-data) | ~$0.001/post |
+
 # When to use this skill
 
 - "Write me a blog post about X"

@@ -99,7 +99,10 @@ export async function fetchFromApi(
   // BYOK: if the user has a Bright Data key configured locally and wants X,
   // forward the creds inside the body. The server forgets them after the call.
   const bdKey = config.brightdata_api_key;
-  const bdDataset = readEnv("BRIGHTDATA_DATASET_ID") ?? readEnv("BRIGHTDATA_DATASET_ID_X_POSTS");
+  const bdDataset =
+    config.brightdata_dataset_id ??
+    readEnv("BRIGHTDATA_DATASET_ID") ??
+    readEnv("BRIGHTDATA_DATASET_ID_X_POSTS");
   if (x_handles.length > 0 && bdKey && bdDataset) {
     body.creds = { brightdata: { api_key: bdKey, dataset_id: bdDataset } };
   }
