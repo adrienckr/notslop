@@ -46,21 +46,48 @@ Open Claude Code. Type *"write me a tweet about &lt;your topic&gt;"*. Done.
 
 ## Skills
 
-Trigger any of the 19 skills with natural language inside Claude Code.
+19 skills bundled. Trigger any of them in Claude Code with natural language.
 
-**Content creation (14)** — `write-x-tweet`, `write-x-thread`, `write-x-article`, `write-linkedin-post`, `write-reddit-post`, `write-reddit-reply`, `write-blog-post` (SEO-aware, 1500–3000 words), `write-blog-headline`, `write-show-hn-post`, `write-product-hunt-launch`, `write-readme-pitch`, `write-cold-dm`, `write-twitter-bio`, `repurpose`.
+### Content creation — 14 skills
 
-**Research & analysis (5)** — `digest` (what's hot today), `trending` (what's blowing up in 6h), `pulse` (theme-clustered mention tracker), `voices` (influential authors on a topic), `find-related` (semantic similarity to a draft).
+| Platform | Skill | Use for |
+|---|---|---|
+| **X / Twitter** | `notslop-write-x-tweet` | single tweet, hard 280-char cap |
+|  | `notslop-write-x-thread` | multi-tweet sequence |
+|  | `notslop-write-x-article` | long-form Notes (up to 25k chars) |
+|  | `notslop-write-twitter-bio` | bio rewrite, 5 patterns |
+| **LinkedIn** | `notslop-write-linkedin-post` | 1000–1300 char post |
+| **Reddit** | `notslop-write-reddit-post` | new post for a specific sub |
+|  | `notslop-write-reddit-reply` | reply in an existing thread |
+| **Blog / SEO** | `notslop-write-blog-post` | 1500–3000 word post, SEO-aware, E-E-A-T citations |
+|  | `notslop-write-blog-headline` | 8 candidate H1 + meta description |
+| **Launches** | `notslop-write-show-hn-post` | Show HN title + body |
+|  | `notslop-write-product-hunt-launch` | tagline + maker comment + features |
+|  | `notslop-write-readme-pitch` | hero section for an OSS repo |
+| **Outreach** | `notslop-write-cold-dm` | personalised DM grounded in target's posts |
+| **Reuse** | `notslop-repurpose` | adapt an existing post to other platforms |
 
-Each skill is a small `SKILL.md` in `~/.claude/skills/notslop-*/` after `install --claude`. Read them, tweak them, fork them — they're MIT.
+### Research & analysis — 5 skills
 
-### Skills are community-driven
+| Skill | Use for |
+|---|---|
+| `notslop-digest` | reranked digest of what's said on a topic right now |
+| `notslop-trending` | what's blowing up in a niche in the last 6h |
+| `notslop-pulse` | mention tracker over 7d, clustered into themes |
+| `notslop-voices` | influential authors on a topic |
+| `notslop-find-related` | semantic similarity to a URL or text snippet |
+
+Each skill is one `SKILL.md` file in `~/.claude/skills/notslop-*/` after `install --claude`. Read them, tweak them, fork them — MIT.
+
+---
+
+## Skills are community-driven
 
 The 14 content skills are starting points. They work — but the quality ceiling on each surface (the right hook for an X thread, the right anatomy for a Show HN post, the right tone for a LinkedIn opener) comes from people who write that kind of content every day. If you do, your taste is exactly what's missing.
 
 PRs that **sharpen** a skill — tighter output rules, a better hook pattern, killing a recurring slop phrase, adding a tone variant — are the most useful contributions notslop can get. PRs that **add a new content skill** for a platform or format not yet covered are also welcome.
 
-How to contribute: read the [Contributing to content skills](./CONTRIBUTING.md#contributing-to-content-skills) section in `CONTRIBUTING.md`. The bar for getting a PR merged is *"this clearly produces less slop"* — concrete before/after examples in the PR description make that easy to judge.
+How to contribute → [`CONTRIBUTING.md#contributing-to-content-skills`](./CONTRIBUTING.md#contributing-to-content-skills). The merge bar is *"this clearly produces less slop"* — concrete before/after examples in the PR description make that easy to judge.
 
 ---
 
