@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <strong>Fresh social context for AI agents.</strong><br/>
-  Reddit, Hacker News, blogs, X — reranked, piped into Claude Code via 19 skills.
+  Fresh social context for AI agents. Reddit, Hacker News, blogs and X,
+  reranked and piped into Claude Code via 19 skills.
 </p>
 
 <p align="center">
@@ -17,151 +17,140 @@
 
 ## What it does
 
-Ask Claude Code to write a tweet, a blog post, a Reddit reply, a cold DM. Claude doesn't know today's signal — training cutoff is months old — so the output reads like AI slop: generic, vague, citing "trends" that don't exist.
+Claude's training cutoff is months old. When you ask it to write a tweet or a Reddit reply on a topic, it has no information about what people are actually saying on that topic right now. The output usually invents examples and references trends that do not exist.
 
-`notslop` is the data layer that fixes it. A shell command that pulls today's actual discussions across Reddit, HN, blogs, and X. Reranks them by relevance with [ZeroEntropy](https://zeroentropy.dev). Hands the top 10 to the agent before it writes.
+notslop fetches that missing context. It is a CLI plus a set of Claude Code skills. When you ask Claude Code to write something on a topic, the matching skill runs `notslop digest "<topic>"` in bash. That command pulls recent posts from Reddit, Hacker News, RSS blogs, and X, reranks them by relevance with ZeroEntropy, and returns the top 10 to Claude as context. Claude then writes the content using those posts.
 
-The post stops reading like slop.
+The result is content that references real recent posts rather than fabricated ones.
 
 ---
 
-## 60-second setup
+## Setup
 
-Two free accounts, two commands.
+You need two free API keys.
 
-**1.** Get a [ZeroEntropy](https://dashboard.zeroentropy.dev) key — free tier covers most usage.
+1. ZeroEntropy, at dashboard.zeroentropy.dev. Used for the reranker and the embeddings. Free tier covers most usage.
+2. Orthogonal, at orthogonal.com/sign-up. Used for X scraping. 10 USD of free credits at signup. Skip this if you do not need X.
 
-**2.** Get an [Orthogonal](https://orthogonal.com/sign-up) key — optional, only if you want X scraping. $10 free credits at signup (~500 X scrapes).
-
-**3.** Install:
+Then:
 
 ```bash
-npx notslop init             # paste the two keys, pick handles / subreddits / blogs
-npx notslop install --claude # drops 19 skills into ~/.claude/skills/
+npx notslop init
+npx notslop install --claude
 ```
 
-Open Claude Code. Type *"write me a tweet about &lt;your topic&gt;"*. Done.
+The first command asks for the two keys plus the X handles, subreddits, and blog URLs you want to track. The second drops 19 skill files into `~/.claude/skills/`.
+
+---
+
+## CLI
+
+```bash
+notslop digest        "<topic>"      # reranked digest of recent posts on a topic
+notslop trending      "<niche>"      # what is moving in a niche over the last 6h
+notslop pulse         "<topic>"      # mention tracker over 7d, clustered into themes
+notslop voices        "<topic>"      # influential authors on a topic
+notslop find-related  "<text|url>"   # semantic similarity to a draft or URL
+notslop sources                      # status of every configured source
+notslop list ls                      # manage named lists of profiles, blogs, subs
+```
+
+Run `notslop --help` for all flags.
 
 ---
 
 ## Skills
 
-19 skills bundled. Trigger any of them in Claude Code with natural language.
+19 skills bundled. They trigger in Claude Code from natural language.
 
-### Content creation — 14 skills
+### Content creation (14)
 
-| Platform | Skill | Use for |
+| Platform | Skill | Purpose |
 |---|---|---|
-| **X / Twitter** | `notslop-write-x-tweet` | single tweet, hard 280-char cap |
+| X / Twitter | `notslop-write-x-tweet` | single tweet, 280-char cap |
 |  | `notslop-write-x-thread` | multi-tweet sequence |
-|  | `notslop-write-x-article` | long-form Notes (up to 25k chars) |
+|  | `notslop-write-x-article` | long-form Notes, up to 25k chars |
 |  | `notslop-write-twitter-bio` | bio rewrite, 5 patterns |
-| **LinkedIn** | `notslop-write-linkedin-post` | 1000–1300 char post |
-| **Reddit** | `notslop-write-reddit-post` | new post for a specific sub |
+| LinkedIn | `notslop-write-linkedin-post` | 1000 to 1300 character post |
+| Reddit | `notslop-write-reddit-post` | new post for a specific sub |
 |  | `notslop-write-reddit-reply` | reply in an existing thread |
-| **Blog / SEO** | `notslop-write-blog-post` | 1500–3000 word post, SEO-aware, E-E-A-T citations |
-|  | `notslop-write-blog-headline` | 8 candidate H1 + meta description |
-| **Launches** | `notslop-write-show-hn-post` | Show HN title + body |
-|  | `notslop-write-product-hunt-launch` | tagline + maker comment + features |
-|  | `notslop-write-readme-pitch` | hero section for an OSS repo |
-| **Outreach** | `notslop-write-cold-dm` | personalised DM grounded in target's posts |
-| **Reuse** | `notslop-repurpose` | adapt an existing post to other platforms |
+| Blog | `notslop-write-blog-post` | 1500 to 3000 word post with SEO-aware structure |
+|  | `notslop-write-blog-headline` | 8 candidate H1 titles and meta descriptions |
+| Launches | `notslop-write-show-hn-post` | Show HN title and body |
+|  | `notslop-write-product-hunt-launch` | tagline, maker note, feature highlights |
+|  | `notslop-write-readme-pitch` | hero section for an open-source repo |
+| Outreach | `notslop-write-cold-dm` | personalised DM grounded in the recipient's recent posts |
+| Reuse | `notslop-repurpose` | adapt an existing post to other platforms |
 
-### Research & analysis — 5 skills
+### Research and analysis (5)
 
-| Skill | Use for |
+| Skill | Purpose |
 |---|---|
-| `notslop-digest` | reranked digest of what's said on a topic right now |
-| `notslop-trending` | what's blowing up in a niche in the last 6h |
+| `notslop-digest` | reranked digest of what is being said on a topic |
+| `notslop-trending` | what is moving in a niche over the last 6h |
 | `notslop-pulse` | mention tracker over 7d, clustered into themes |
 | `notslop-voices` | influential authors on a topic |
 | `notslop-find-related` | semantic similarity to a URL or text snippet |
 
-Each skill is one `SKILL.md` file in `~/.claude/skills/notslop-*/` after `install --claude`. Read them, tweak them, fork them — MIT.
+Each skill is one SKILL.md file in `~/.claude/skills/notslop-*/`. The files are readable and intended to be edited or forked.
 
 ---
 
-## Skills are community-driven
+## Contributing to the content skills
 
-The 14 content skills are starting points. They work — but the quality ceiling on each surface (the right hook for an X thread, the right anatomy for a Show HN post, the right tone for a LinkedIn opener) comes from people who write that kind of content every day. If you do, your taste is exactly what's missing.
+The 14 content skills are bundled defaults. They work, but the per-platform output rules (length, tone, structure) are the part that benefits most from people who write that kind of content regularly.
 
-PRs that **sharpen** a skill — tighter output rules, a better hook pattern, killing a recurring slop phrase, adding a tone variant — are the most useful contributions notslop can get. PRs that **add a new content skill** for a platform or format not yet covered are also welcome.
+If you write tweets, threads, LinkedIn posts, Reddit posts, blog posts, cold DMs, or launch posts on a regular basis, the most useful thing you can contribute is to open the relevant SKILL.md, sharpen the output rules section, and submit a PR with a before-and-after example.
 
-How to contribute → [`CONTRIBUTING.md#contributing-to-content-skills`](./CONTRIBUTING.md#contributing-to-content-skills). The merge bar is *"this clearly produces less slop"* — concrete before/after examples in the PR description make that easy to judge.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the file structure and the PR review process.
 
 ---
 
 ## How it works
 
-Your phrase to Claude Code matches one of the 19 skills. The skill runs `notslop digest "<your topic>" --for-content` in bash, which kicks off the pipeline:
-
 ```
-        ┌────────┬──────────┬──────────────┬────────────────┐
-        ▼        ▼          ▼              ▼                ▼
-     reddit    hn        blogs           x               (4 sources)
-     JSON    Algolia   RSS+cheerio   Orthogonal
-     (free)  (free)    (free)        (~$0.02/handle)
+your phrase to Claude Code
         │
         ▼
-   ZeroEntropy zembed-1 — cross-source dedup
+   matching skill in ~/.claude/skills/notslop-*
         │
         ▼
-   ZeroEntropy zerank-2 — rerank top 10 by semantic relevance
+   skill runs `notslop digest "<topic>" --for-content` in bash
+        │
+   ┌────┴────┬─────────┬─────────────┐
+   ▼         ▼         ▼             ▼
+ reddit    hn        blogs           x
+ JSON    Algolia   RSS+cheerio    Orthogonal
+ (free)  (free)    (free)         (~$0.02 per handle)
         │
         ▼
-   condensed JSON → Claude writes the post, citing real data points
+   ZeroEntropy zembed-1 for cross-source deduplication
+        │
+        ▼
+   ZeroEntropy zerank-2 for top-10 relevance ranking
+        │
+        ▼
+   condensed JSON returned to Claude
+        │
+        ▼
+   Claude writes the content, citing 2 data points from real posts
 ```
 
-Total round-trip: 1–3s warm cache, 5–10s fresh fetch.
-
----
-
-## CLI commands
-
-```bash
-notslop digest        "<topic>"      # multi-source reranked digest
-notslop trending      "<niche>"      # what's blowing up right now (6h)
-notslop pulse         "<topic>"      # theme-clustered mention tracker (7d)
-notslop voices        "<topic>"      # influential authors on a topic
-notslop find-related  "<text|url>"   # semantic similarity search
-notslop sources                      # status of every configured source
-notslop list ls                      # manage named lists (x_profiles, subs, blogs)
-```
-
-`notslop --help` for full flags.
-
----
-
-## Sources & providers
-
-Two keys total. ZeroEntropy is required; Orthogonal is optional.
-
-| Source | Provider | Cost |
-|---|---|---|
-| Reddit, HN, blogs | built-in (public APIs / RSS) | free |
-| Rerank + embed | ZeroEntropy | free tier covers most usage |
-| X (Twitter) | Orthogonal → ScrapeCreators | $10 free → ~$0.02 per handle scrape |
-
-Per-source setup walkthroughs are in [PROVIDERS.md](./PROVIDERS.md). `notslop sources` prints what's wired on your machine. `notslop sources --check x` live-tests a source.
+Round-trip: roughly 1 to 3 seconds with a warm cache, 5 to 10 seconds on a cold fetch.
 
 ---
 
 ## Configuration
 
-`notslop init` writes `~/.notslop/config.json`. Env vars override what's in the file:
+`notslop init` writes `~/.notslop/config.json`. Environment variables override what is in the file.
 
 ```
-ZEROENTROPY_API_KEY      required — rerank + embed (runs locally)
-ORTHOGONAL_API_KEY       optional — X scraping
+ZEROENTROPY_API_KEY      required, used locally for rerank and embed
+ORTHOGONAL_API_KEY       optional, used for X scraping
 ```
 
 ---
 
-## Companion repos
+## License
 
-- [`notslop-api`](https://github.com/adrienckr/notslop-api) — optional stateless gateway behind a `--api <url>` flag for teams that want to centralize scraping. MIT. Self-host on Fly.io.
-- [`notslop-web`](https://github.com/adrienckr/notslop-web) — the landing page at [notslop.dev](https://notslop.dev). Astro + Tailwind. MIT.
-
----
-
-<sub>Built by <a href="https://github.com/adrienckr">@adrienckr</a>. MIT-licensed.</sub>
+MIT. See [LICENSE](./LICENSE).
