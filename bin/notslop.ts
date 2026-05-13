@@ -51,7 +51,38 @@ program
     // Capture the banner to a string by tee-ing kleur output. Simpler: re-render here.
     printBanner();
     return out.join("");
-  });
+  })
+  .addHelpText(
+    "after",
+    `
+How it works:
+  1. CLI fetches raw posts from Reddit + HN + blogs (RSS) + X (Bright Data).
+  2. ZeroEntropy  zembed-1  dedups near-duplicates across sources (cosine > 0.85).
+  3. ZeroEntropy  zerank-2  reranks candidates by semantic relevance to your topic.
+  4. Output is the top-N reranked posts — your agent grounds its writing in real signal.
+
+  Get a free ZeroEntropy key:  https://dashboard.zeroentropy.dev
+
+Claude Code skills (run \`notslop install --claude\` once, then use natural language):
+
+  "write me a tweet about <topic>"          → notslop-write-x-tweet
+  "write an X thread about <topic>"         → notslop-write-x-thread
+  "write an X article about <topic>"        → notslop-write-x-article
+  "write a LinkedIn post about <topic>"     → notslop-write-linkedin-post
+  "write a Reddit post for r/<sub>"         → notslop-write-reddit-post
+  "reply to <reddit-thread-url>"            → notslop-write-reddit-reply
+  "repurpose <my-post> for other platforms" → notslop-repurpose
+  "what's hot on <topic> today"             → notslop-digest / -trending
+  "who's shaping the <topic> conversation"  → notslop-voices
+  "find posts similar to <url-or-text>"     → notslop-find-related
+
+Each skill fetches fresh signal via the CLI and grounds the output in real posts.
+
+Hosted gateway (optional):
+  --api <url> --api-key <key>   pull raw posts from a hosted notslop-api
+  ZE rerank still runs on YOUR ZeroEntropy key (BYOK pattern).
+`,
+  );
 
 program
   .command("init")

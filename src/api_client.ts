@@ -1,18 +1,19 @@
 /**
- * Thin client for `notslop-api` — the hosted scraping gateway.
+ * Thin client for `notslop-api` — the hosted (or self-hosted) scraping gateway.
  *
- * When the CLI is invoked with `--api <url> --api-key <key>` (or the matching
- * env vars `NOTSLOP_API_URL` / `NOTSLOP_API_KEY` are set), `fetchAll` swaps
- * the local platform fan-out for a single round-trip to `/v1/feed`. The rest
- * of the pipeline (rerank, dedup, output) is unchanged — ZE still runs on the
- * user's own key, BYOK style.
+ * When the CLI is invoked with `--api <url>` (or the env var `NOTSLOP_API_URL`
+ * is set), `fetchAll` swaps the local platform fan-out for a single round-trip
+ * to `POST /v1/scrape`. The CLI sends its local config (subreddits, X handles,
+ * blog URLs, Bright Data creds) in the body — the server is stateless and
+ * stores nothing about the caller. The rest of the pipeline (rerank, dedup,
+ * output) is unchanged — ZE still runs locally on the user's own key.
  */
 
 import { request } from "undici";
 
-import type { FetchQuery, Post } from "./types.js";
+import type { Config, FetchQuery, Post } from "./types.js";
 
-interface FeedResponse {
+interface ScrapeResponse {
   posts: unknown;
 }
 
@@ -21,20 +22,22 @@ function readEnv(name: string): string | undefined {
   return v && v.length > 0 ? v : undefined;
 }
 
-export interface ApiCreds {
+export interface ApiTarget {
   url: string;
-  key: string;
 }
 
 /**
- * Resolve api creds from explicit flags (preferred) or env vars (fallback).
+ * Resolve api target from explicit flag (preferred) or env var (fallback).
  * Returns `undefined` when neither is set — caller falls back to local fetch.
+ *
+ * Note: as of notslop-api v0.2 the gateway is stateless and accepts
+ * unauthenticated calls. No bearer token is required. `--api-key` is accepted
+ * for backwards compatibility but ignored.
  */
-export function resolveApiCreds(flagUrl?: string, flagKey?: string): ApiCreds | undefined {
+export function resolveApiTarget(flagUrl?: string): ApiTarget | undefined {
   const url = flagUrl ?? readEnv("NOTSLOP_API_URL");
-  const key = flagKey ?? readEnv("NOTSLOP_API_KEY");
-  if (!url || !key) return undefined;
-  return { url: url.replace(/\/$/, ""), key };
+  if (!url) return undefined;
+  return { url: url.replace(/\/$/, "") };
 }
 
 function isPost(value: unknown): value is Post {
@@ -50,36 +53,79 @@ function isPost(value: unknown): value is Post {
   );
 }
 
-/**
- * Fetch posts from notslop-api `/v1/feed`. Maps `query` to the equivalent
- * query-string params. Errors surface to caller — the CLI prints them and
- * exits with status 1.
- */
-export async function fetchFromApi(query: FetchQuery, creds: ApiCreds): Promise<Post[]> {
-  const params = new URLSearchParams();
-  if (query.query && query.query.length > 0) params.set("topic", query.query);
-  if (query.since) params.set("since", query.since);
-  if (query.per_source_limit)
-    params.set("limit", String(Math.max(1, Math.min(200, query.per_source_limit))));
+interface ScrapeBody {
+  topic?: string;
+  since?: string;
+  limit?: number;
+  sources: {
+    reddit?: string[];
+    blogs?: string[];
+    x?: string[];
+    hn: boolean;
+  };
+  creds?: {
+    brightdata?: { api_key: string; dataset_id: string };
+  };
+}
 
-  const url = `${creds.url}/v1/feed?${params.toString()}`;
-  const { statusCode, body } = await request(url, {
-    method: "GET",
+/**
+ * POST /v1/scrape with the caller's local config in the body. Stateless on
+ * the server side — every request stands alone.
+ */
+export async function fetchFromApi(
+  query: FetchQuery,
+  config: Config,
+  target: ApiTarget,
+): Promise<Post[]> {
+  const subreddits = query.subreddits ?? config.subreddits ?? [];
+  const blogs = query.blog_urls ?? config.blogs ?? [];
+  const x_handles = query.x_profiles ?? config.x_profiles ?? [];
+
+  const body: ScrapeBody = {
+    sources: {
+      reddit: subreddits.length > 0 ? subreddits : undefined,
+      blogs: blogs.length > 0 ? blogs : undefined,
+      x: x_handles.length > 0 ? x_handles : undefined,
+      hn: true,
+    },
+  };
+
+  if (query.query && query.query.length > 0) body.topic = query.query;
+  if (query.since) body.since = query.since;
+  if (query.per_source_limit) {
+    body.limit = Math.max(1, Math.min(200, query.per_source_limit));
+  }
+
+  // BYOK: if the user has a Bright Data key configured locally and wants X,
+  // forward the creds inside the body. The server forgets them after the call.
+  const bdKey = config.brightdata_api_key;
+  const bdDataset = readEnv("BRIGHTDATA_DATASET_ID") ?? readEnv("BRIGHTDATA_DATASET_ID_X_POSTS");
+  if (x_handles.length > 0 && bdKey && bdDataset) {
+    body.creds = { brightdata: { api_key: bdKey, dataset_id: bdDataset } };
+  }
+
+  const url = `${target.url}/v1/scrape`;
+  const { statusCode, body: resBody } = await request(url, {
+    method: "POST",
     headers: {
-      authorization: `Bearer ${creds.key}`,
+      "content-type": "application/json",
       accept: "application/json",
     },
+    body: JSON.stringify(body),
   });
 
-  if (statusCode === 401) {
-    throw new Error("notslop-api auth failed — check --api-key (or NOTSLOP_API_KEY env)");
+  if (statusCode === 429) {
+    const text = await resBody.text().catch(() => "");
+    throw new Error(
+      `notslop-api rate-limited: ${text.slice(0, 200)} — provide your own Bright Data key to skip the hosted quota`,
+    );
   }
   if (statusCode < 200 || statusCode >= 300) {
-    const text = await body.text().catch(() => "");
+    const text = await resBody.text().catch(() => "");
     throw new Error(`notslop-api fetch failed: HTTP ${statusCode} ${text.slice(0, 200)}`);
   }
 
-  const parsed = (await body.json()) as FeedResponse;
+  const parsed = (await resBody.json()) as ScrapeResponse;
   if (!parsed || !Array.isArray(parsed.posts)) {
     throw new Error("notslop-api returned unexpected payload (missing posts[])");
   }

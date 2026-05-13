@@ -92,11 +92,10 @@ export function gradient(
 export function printBanner(): void {
   if (!process.stdout.isTTY) return;
   process.stdout.write("\n");
+  // Solid bold cyan — gradient char-by-char on block chars created visual
+  // banding that didn't read well. Keep it clean.
   for (const line of BANNER_LINES) {
-    const colored = supportsTrueColor()
-      ? gradient(line, VAPORWAVE_FROM, VAPORWAVE_TO)
-      : kleur.cyan(line);
-    process.stdout.write(`  ${colored}\n`);
+    process.stdout.write(`  ${kleur.bold().cyan(line)}\n`);
   }
   process.stdout.write(`  ${kleur.dim(BANNER_TAGLINE)}\n`);
   process.stdout.write(`  ${kleur.dim().italic(BANNER_SUBTAG)}\n\n`);

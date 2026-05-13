@@ -3,6 +3,31 @@
 All notable changes to this project will be documented here.
 Follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [SemVer](https://semver.org).
 
+## [0.5.0] — 2026-05-13
+
+### Changed (breaking)
+
+- `--api-key` flag is now optional (and effectively ignored). The companion
+  `notslop-api` v0.2 dropped multi-tenancy entirely and runs as a stateless
+  BYOK proxy — there are no user accounts to authenticate against.
+- The `--api` codepath now does a single `POST /v1/scrape` with the local
+  config (subreddits, X handles, blog URLs, Bright Data creds) embedded in the
+  body, instead of the old `GET /v1/feed?topic=` against a per-user feed.
+
+### Added
+
+- BYOK pass-through: when a Bright Data API key is set in the local config
+  and `BRIGHTDATA_DATASET_ID` (or `BRIGHTDATA_DATASET_ID_X_POSTS`) is in the
+  environment, the CLI forwards both inside the API body so the hosted server
+  scrapes X on the caller's account. The server never stores them.
+
+### Notes
+
+- Existing scripts that pass `--api-key` keep working — the flag is accepted
+  silently for backwards compat with v0.4 wiring.
+- ZeroEntropy rerank still runs locally on the user's own key, exactly as
+  before. The hosted `notslop-api` never sees the ZE key.
+
 ## [0.4.0] — 2026-05-12
 
 ### Added

@@ -10,7 +10,7 @@
 
 import ora from "ora";
 
-import { fetchFromApi, resolveApiCreds } from "../api_client.js";
+import { type ApiTarget, fetchFromApi, resolveApiTarget } from "../api_client.js";
 import type { Platform } from "../platforms/_base.js";
 import { blogsPlatform } from "../platforms/blogs.js";
 import { hnPlatform } from "../platforms/hn.js";
@@ -95,9 +95,9 @@ export async function fetchAll(
   onProgress: (name: string, status: "ok" | "skip" | "err", count: number, detail?: string) => void,
   apiOpts?: { api?: string; apiKey?: string },
 ): Promise<FetchAllResult> {
-  const creds = resolveApiCreds(apiOpts?.api, apiOpts?.apiKey);
-  if (creds) {
-    return fetchAllViaApi(query, creds, onProgress);
+  const target = resolveApiTarget(apiOpts?.api);
+  if (target) {
+    return fetchAllViaApi(query, config, target, onProgress);
   }
   const spinners = new Map<string, ReturnType<typeof ora>>();
   const useSpinners = process.stdout.isTTY ?? false;
@@ -146,21 +146,24 @@ export async function fetchAll(
 }
 
 /**
- * `--api` codepath: 1 HTTP call to notslop-api `/v1/feed`. Single spinner.
+ * `--api` codepath: 1 POST to notslop-api `/v1/scrape` with the caller's
+ * local config inside the body. The server is stateless and forgets the
+ * request as soon as it responds.
  */
 async function fetchAllViaApi(
   query: FetchQuery,
-  creds: { url: string; key: string },
+  config: Config,
+  target: ApiTarget,
   onProgress: (name: string, status: "ok" | "skip" | "err", count: number, detail?: string) => void,
 ): Promise<FetchAllResult> {
   const useSpinner = process.stdout.isTTY ?? false;
-  const spinner = useSpinner ? ora({ text: `notslop-api ${creds.url}…`, spinner: "dots" }) : null;
+  const spinner = useSpinner ? ora({ text: `notslop-api ${target.url}…`, spinner: "dots" }) : null;
   if (spinner) spinner.start();
 
   try {
-    const posts = await fetchFromApi(query, creds);
+    const posts = await fetchFromApi(query, config, target);
     if (spinner) spinner.succeed(`notslop-api  ${posts.length} posts`);
-    onProgress("notslop-api", posts.length > 0 ? "ok" : "skip", posts.length, creds.url);
+    onProgress("notslop-api", posts.length > 0 ? "ok" : "skip", posts.length, target.url);
     return {
       posts,
       fetched: [
@@ -168,7 +171,7 @@ async function fetchAllViaApi(
           source: "notslop-api",
           count: posts.length,
           status: posts.length > 0 ? "ok" : "skip",
-          detail: creds.url,
+          detail: target.url,
         },
       ],
     };
