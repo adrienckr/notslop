@@ -193,9 +193,9 @@ NOTSLOP_API_URL          point at a hosted notslop-api instance
 
 ---
 
-## Disclosure
+## Notes
 
-Built by [@adrienckr](https://github.com/adrienckr), Head of Growth at [ZeroEntropy](https://zeroentropy.dev). ZE is one possible rerank/embed provider; the CLI reads your ZE key locally and never sends it to any third party. The included `notslop-api` companion can be self-hosted if you don't trust the hosted instance.
+Built by [@adrienckr](https://github.com/adrienckr). The CLI reads your ZeroEntropy key locally and never sends it to any third party — rerank and embed happen on your machine. The included `notslop-api` companion can be self-hosted if you don't want to use the hosted instance.
 
 ## License
 

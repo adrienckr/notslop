@@ -71,27 +71,60 @@ function isRedditChild(value: unknown): value is RedditChild {
   );
 }
 
+const MAX_RETRIES = 3;
+
+function backoffDelay(attempt: number, retryAfterHeader: string | string[] | undefined): number {
+  // Honor Reddit's Retry-After (seconds) if present.
+  if (retryAfterHeader) {
+    const raw = Array.isArray(retryAfterHeader) ? retryAfterHeader[0] : retryAfterHeader;
+    const n = Number.parseInt(raw ?? "", 10);
+    if (Number.isFinite(n) && n > 0) return Math.min(n * 1000, 30_000);
+  }
+  // Exponential backoff with jitter: 500ms, 1.5s, 3s.
+  const base = 500 * 2 ** attempt;
+  const jitter = Math.floor(Math.random() * 300);
+  return Math.min(base + jitter, 30_000);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function fetchJson(url: string, ttlSeconds: number): Promise<RedditListing> {
   const key = cacheKey("reddit", url);
   const cached = cacheGet<RedditListing>(key);
   if (cached) return cached;
 
-  const { statusCode, body } = await request(url, {
-    method: "GET",
-    headers: {
-      "User-Agent": USER_AGENT,
-      Accept: "application/json",
-    },
-  });
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const { statusCode, headers, body } = await request(url, {
+      method: "GET",
+      headers: {
+        "User-Agent": USER_AGENT,
+        Accept: "application/json",
+      },
+    });
 
-  if (statusCode < 200 || statusCode >= 300) {
-    throw new Error(`reddit fetch failed: HTTP ${statusCode}`);
+    if (statusCode === 429 || statusCode === 503) {
+      // Drain body so undici can reuse the socket.
+      await body.text().catch(() => "");
+      if (attempt >= MAX_RETRIES) {
+        throw new Error(
+          `reddit rate-limited (HTTP ${statusCode}) after ${MAX_RETRIES + 1} attempts`,
+        );
+      }
+      await sleep(backoffDelay(attempt, headers["retry-after"]));
+      continue;
+    }
+    if (statusCode < 200 || statusCode >= 300) {
+      throw new Error(`reddit fetch failed: HTTP ${statusCode}`);
+    }
+
+    const text = await body.text();
+    const parsed = JSON.parse(text) as RedditListing;
+    cacheSet(key, parsed, ttlSeconds);
+    return parsed;
   }
-
-  const text = await body.text();
-  const parsed = JSON.parse(text) as RedditListing;
-  cacheSet(key, parsed, ttlSeconds);
-  return parsed;
+  throw new Error("reddit fetch failed: exhausted retries");
 }
 
 function normalize(child: RedditChild): Post {
