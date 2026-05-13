@@ -54,6 +54,14 @@ Trigger any of the 19 skills with natural language inside Claude Code.
 
 Each skill is a small `SKILL.md` in `~/.claude/skills/notslop-*/` after `install --claude`. Read them, tweak them, fork them — they're MIT.
 
+### Skills are community-driven
+
+The 14 content skills are starting points. They work — but the quality ceiling on each surface (the right hook for an X thread, the right anatomy for a Show HN post, the right tone for a LinkedIn opener) comes from people who write that kind of content every day. If you do, your taste is exactly what's missing.
+
+PRs that **sharpen** a skill — tighter output rules, a better hook pattern, killing a recurring slop phrase, adding a tone variant — are the most useful contributions notslop can get. PRs that **add a new content skill** for a platform or format not yet covered are also welcome.
+
+How to contribute: read the [Contributing to content skills](./CONTRIBUTING.md#contributing-to-content-skills) section in `CONTRIBUTING.md`. The bar for getting a PR merged is *"this clearly produces less slop"* — concrete before/after examples in the PR description make that easy to judge.
+
 ---
 
 ## How it works

@@ -75,6 +75,89 @@ should ship with at least one happy-path test.
 - Keep PRs focused. One platform or one command per PR.
 - Run `npm run typecheck && npm run lint && npm test` before pushing.
 
+## Contributing to content skills
+
+The 14 content-creation skills in `skills/notslop-write-*/` are the most
+contribution-friendly part of the repo. Each one is a single `SKILL.md` file
+that tells Claude how to write for a specific surface (a tweet, a thread, a
+Reddit reply, a cold DM, a blog post, etc.). They ship as starting points —
+the real quality ceiling on each surface comes from people who write that kind
+of content every day.
+
+PRs that **sharpen what's already there** are the most useful kind of
+contribution notslop can get:
+
+- **Better hook patterns** for a specific platform (e.g. what actually gets a
+  tweet engagement in your niche).
+- **Tighter output rules** to kill recurring slop phrasing.
+- **Length / format constraints** that match how the platform's algo actually
+  treats posts.
+- **Real examples** of "good" vs "bad" output that the skill should produce.
+- **New tone variants** for a skill that currently produces one voice.
+
+PRs that **add a new content skill** are also welcome — pick a platform or
+format not yet covered, follow the existing pattern, propose it.
+
+### Skill file format
+
+Each skill is a directory under `skills/` with a single `SKILL.md` file:
+
+```
+skills/notslop-write-x-tweet/
+└── SKILL.md
+```
+
+Frontmatter + body:
+
+```markdown
+---
+name: notslop-write-x-tweet
+description: Use when the user wants to draft a single tweet on a topic. ...
+---
+
+## Providers required
+
+| Capability | Required | Providers | Setup | Cost |
+|---|---|---|---|---|
+| ... | ... | ... | ... | ... |
+
+# When to use this skill
+
+- "Write me a tweet about X"
+- ...
+
+# Setup
+
+# Steps
+
+1. Run `notslop digest "<TOPIC>" --since 24h --top 10 --for-content`
+2. Pick 2 specific data points from the digest.
+3. Draft the tweet with the rules below.
+
+# Output rules
+
+- Hard cap 280 chars.
+- No hashtags, no emojis unless asked.
+- No "in today's rapidly evolving landscape" / generic openers.
+- Cite the 2 data points concretely.
+```
+
+### How to propose a skill change
+
+1. Edit the skill's `SKILL.md` directly.
+2. In the PR description, include 1–2 real examples of "before" vs "after"
+   output so a reviewer can see the improvement.
+3. If the change is about banning a phrase or a structure, add the phrase to
+   the skill's "Output rules" / "Constraints" block explicitly.
+4. Don't change the file's `name:` frontmatter — it's the public skill slug
+   and renaming it breaks every existing installation.
+
+If you write a lot of tweets, threads, LinkedIn posts, Reddit posts, blog
+posts, README hero blocks, cold DMs, Show HN launches, ProductHunt launches —
+your taste is exactly what these skills are missing. The bar for getting a PR
+merged is "this clearly produces less slop." Concrete before/after examples
+make that easy to judge.
+
 ## Where ZeroEntropy fits
 
 ZeroEntropy's zerank-2 reranker is the quality layer that turns "every result a
