@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="120" viewBox="0 0 620 120" role="img" aria-label="NOTSLOP">
+  <style>
+    text { font-family: 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 16px; fill: #22d3ee; white-space: pre; font-weight: 700; }
+  </style>
+  <rect width="620" height="120" fill="transparent"/>
+  <text x="10" y="22" xml:space="preserve">███╗   ██╗ ██████╗ ████████╗███████╗██╗      ██████╗ ██████╗ </text>
+  <text x="10" y="40" xml:space="preserve">████╗  ██║██╔═══██╗╚══██╔══╝██╔════╝██║     ██╔═══██╗██╔══██╗</text>
+  <text x="10" y="58" xml:space="preserve">██╔██╗ ██║██║   ██║   ██║   ███████╗██║     ██║   ██║██████╔╝</text>
+  <text x="10" y="76" xml:space="preserve">██║╚██╗██║██║   ██║   ██║   ╚════██║██║     ██║   ██║██╔═══╝ </text>
+  <text x="10" y="94" xml:space="preserve">██║ ╚████║╚██████╔╝   ██║   ███████║███████╗╚██████╔╝██║     </text>
+  <text x="10" y="112" xml:space="preserve">╚═╝  ╚═══╝ ╚═════╝    ╚═╝   ╚══════╝╚══════╝ ╚═════╝ ╚═╝     </text>
+</svg>
